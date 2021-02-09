@@ -1,0 +1,15 @@
+
+<!---  fragment_wifi_tableend -->
+</td>
+<input maxlength=" 120 " type="hidden" name="CMD_FLASH" value="NOW">
+</table>
+<br>
+<br>
+<input type="submit" value=" UPDATE " style="height:60px; width:140px; font-size:18">
+</form>
+</table>
+</table>
+
+</table>
+<br>
+

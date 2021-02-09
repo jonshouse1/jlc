@@ -1,0 +1,14 @@
+#!/bin/bash
+#make a list of files and sizes
+
+ls -1 ../www >/tmp/list
+
+echo "<pre>"
+n=0;
+while read p; do
+  	#echo $p
+	SIZE=`stat --printf="%s" ../www/$p`
+
+	echo -e "<a href=$p>$n\t$SIZE\t$p</a>"
+done </tmp/list
+echo "</pre>"

@@ -1,0 +1,10 @@
+# 6 line LED display test
+if no dev B827EBBF391E01 stop
+dev B827EBBF391E01 0 0
+dev B827EBBF391E01 state 1 0 This is the text on line 1
+dev B827EBBF391E01 state 2 0 This is the text on line 2
+dev B827EBBF391E01 state 3 0 This is the text on line 3
+dev B827EBBF391E01 state 4 0 This is the text on line 4
+dev B827EBBF391E01 state 5 0 This is the text on line 5
+dev B827EBBF391E01 state 6 0 This is the text on line 6
+

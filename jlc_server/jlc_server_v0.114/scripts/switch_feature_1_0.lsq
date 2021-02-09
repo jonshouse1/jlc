@@ -1,0 +1,3 @@
+# when button held while group is off (no led)
+pir lockout 16 1
+

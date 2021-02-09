@@ -1,0 +1,28 @@
+
+<!--- fragment_wifi -->
+<table width=95%><td width=5%></td><td>
+
+<br>
+<table width=100%><td><h3>Wifi Settings</h3><td align=right>
+</table>
+<form method="post" action="settings.cgi">
+<table cellspacing=" 1" width=" 100%" cellpadding=" 0" bgcolor="#ffffff" border=" 1">
+
+<input maxlength=" 120 " type="hidden" name="URL" value="admin.cgi">
+
+<!--- alignment padding                                                                                                                    -->
+
+<td align="left" bgcolor="#004785" color=#FFFFFF width=40%>
+<font face="Arial" color="#ffffff" size=" 5">
+SSID
+</td><td>&nbsp;
+<input maxlength=" 120 " size="20" name="SSID" style="font-size:25px" value="$SSID                           " ></font></td><tr>
+
+
+<td align="left" bgcolor="#004785" color=#FFFFFF>
+<font face="Arial" color="#ffffff" size=" 5">
+Password
+</td><td>&nbsp;
+<input maxlength=" 120 " type="password" size="20" style="font-size:25px" name="PASSWORD" value=""                                                                 ></font></td><tr>
+
+

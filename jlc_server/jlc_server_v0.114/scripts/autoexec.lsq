@@ -1,0 +1,9 @@
+# Runs when system starts
+mask create 1 512 W
+univ 1 load
+mask create 2 1024 W
+univ 2 load
+seq load this_is_h.lsq
+mask create 3 512 RGB
+univ 3 load
+

@@ -1,0 +1,11 @@
+# 6 line LED display test, display temperatures
+if no dev B827EBBF391E01 stop
+
+#Clear display
+#dev B827EBBF391E01 state 0 0
+
+dev B827EBBF391E01 state 1 0 Outside temp $E1520800008086_VB
+dev B827EBBF391E01 state 2 0 Shed temp $FF5767A2160404_VB
+dev B827EBBF391E01 state 3 0 Under stairs temp $BC1BCB06000014_VB
+dev B827EBBF391E01 state 6 0 $DATE5
+

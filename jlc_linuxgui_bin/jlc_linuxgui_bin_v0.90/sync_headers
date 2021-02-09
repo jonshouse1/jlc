@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# The clients need to be in sync with the binary protocol uses with the server
+# Pull headers and some source from the latest server version into this project
+
+# Change this to latest version
+SERVER_SOURCEPATH="/disks/vol1/jon/projects/jlighting_system_NEW/jlc_server"
+SERVER_DIRNAME="jlc_server_v0.114"
+
+
+# Grab the headers from the server so that the client structure defintions are in sync
+cp -v "$SERVER_SOURCEPATH"/"$SERVER_DIRNAME"/src/include/jcp_protocol_devs.h ./include/
+cp -v "$SERVER_SOURCEPATH"/"$SERVER_DIRNAME"/src/include/jlc_group.h ./include/
+cp -v "$SERVER_SOURCEPATH"/"$SERVER_DIRNAME"/src/include/jlc_audioplus.h ./include/
+cp -v "$SERVER_SOURCEPATH"/"$SERVER_DIRNAME"/src/include/jlc_effects.h ./include/
+cp -v "$SERVER_SOURCEPATH"/"$SERVER_DIRNAME"/src/include/jlc.h ./include/
+cp -v "$SERVER_SOURCEPATH"/"$SERVER_DIRNAME"/src/include/jlp.h ./include/
+cp -v "$SERVER_SOURCEPATH"/"$SERVER_DIRNAME"/src/jlc_binmsg.c .
+
+echo "Copied headers from server. Now make clean;make"
+
+

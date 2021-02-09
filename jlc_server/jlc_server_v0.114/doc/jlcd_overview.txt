@@ -1,0 +1,355 @@
+
+Design goals.
+
+	Universes are dynamically allocated
+
+	Use UDP broadcast only for discovery
+
+	Lights and switches register with the server
+
+	Lights are mapped into universes based on server side configuration, identified by unique ID
+
+
+
+Universe "MASK"
+R=Red  G=Green  B=Blue  Y=Yellow  W=White  O=Orange  P=Purple  I=pInk  U=UV  X=Unused
+
+Each universe has a mask loaded when it is "created".  A mask describes what each "byte" within the universe is
+
+
+
+
+
+
+********************
+MAC addresses are 6 bytes (12 digits of hex)
+
+A single network device may have multiple "devices" for the lighting system.
+Each lighting system device needs a unique ID, use the devices MAC for the 
+first 6 bytes then use the last two bytes to encode the "device" that IP provides.
+
+Example: Device provides two IDEV devices, a switch and temperature sensor, also
+3 ODEV devices, one for RGB, one DMX bridge and one pixel string array
+
+Device has a MAC c4:2c:03:2e:9c:11.
+
+Lighting system would see
+
+IDEV idx:000 typ:011 noc:003 uid:84F3EBE5E7C90000 ip:10.10.10.208 name:
+
+
+
+***********************
+Device registration
+ When a device registers the server runs a script ./devscripts/UID_reg
+
+When a device is de-registered (by choice or timeout) the server
+runs a script ./devscripts/UID_dereg
+
+
+
+***********************
+Groups
+
+Each group is a set of universe/channels. Groups are numbered one to MAX_GROUPS.
+Details are stored in a file groups/group_N
+On starting the server loads all the groups into a table. If a file is changed
+the server can refresh the groups with "group reload"
+"LIST GROUPS" shows the groups
+
+A group has a "value", a single unsigned 8 bit number corresponding to the current
+value for all the channels within the group.
+"GROUP 1 SHOW" details which universe/channels are part of the group
+"GROUP 1 <value>" will set all univ/chan within the group to that value
+"GROUP 1 ON" is an alias for a value of 255
+"GROUP 1 OFF" is an alias for a value of 0
+
+Switches use their registration script to map the device to a group
+"map <UID> group N"
+
+When a group value is changed, devices tied to the group are sent new state. For 
+example a switch is mapped to group 1, something changes group ones value from 0
+to 255, the switch state is turned from off to on.
+
+Pots may have visual feedback so are just sent the group value.
+
+
+**********************
+Current commands
+
+HELP
+HELP *
+HELP COLOUR
+HELP LIST
+HELP RUN
+HELP UNIV
+HELP MAP
+?
+EVERY
+LIST
+LIST IP
+LIST DEV
+LIST DEV devtype
+LIST DEV devtype FULL
+LIST DEV FULL
+LIST UNIV
+LIST GROUP
+LIST STATE
+MON
+MON ALL
+MON REG
+MON DEVF
+MON DEVN
+MON X
+RUN
+RUN <scriptname>
+MASK
+MASK CREATE <univ> <noc> <pattern>
+MASK SHOW <univ>
+MASK KEY
+COLOUR
+UNIV
+UNIV LOAD <univ>
+UNIV SHOW <univ>
+UNIV <univ> <mask> <value>
+MAP
+MAP <uid> UNIV <univ> <firstchan> [optional num of channels]
+MAP <uid> GROUP <group>
+PRINT <message>
+PRINTCON <message>
+DUMP <univ>
+GROUP <groupnum/reload> <value/show/?/on/off>
+BIN
+SEQ
+
+
+
+
+
+U L 1			Universe load universe 1
+U S 1			Universe show universe 1
+U 1 A 255		Universe 1 All-channels 255
+U 1 R 255		Universe 1 Red 255
+
+
+
+"every 1m run somescript"
+
+
+list dev
+list dev clockcal
+list dev full
+list dev cloclcal full
+
+
+***********************
+Web server
+
+The web server parses the web pages as it outputs, replacing $VARIABLE references with
+values taken from the lighting controller.
+Also adds a not standard tag "<fragment=filename>" the entire tag is replaced with
+the file contents of the file referenced.
+
+
+
+******************
+test http server
+wget -q -S -O - 127.0.0.1:8888
+
+
+
+
+******************
+RELAYS
+	Relays are now dev_n devices, not dev_f, they no longer map to universe/channel
+
+	For a relay to track a group value
+	map 600194843B8105 group 1 
+
+
+
+Double switched
+*****************
+Mapping a push button switch to a group does not cause that switch to perform any action.
+mapping causes the server to update the devices switch state when the group changes, but
+to make the push button switch alter the group it needs a "group N <value>" command
+in its UID_0 and UID_1 file.
+
+
+
+
+****************
+DEVICES
+****************
+
+***
+PIR
+***
+Pir devices send state of  Value1=1 when the PIR triggers and Value1=0 when the PIR changes
+state back to untriggered.
+The server runs a device script UID_1f and UID_1 the first time a PIR is triggered within a 
+time interval, then UID_1 and UID_0 as it changes state after that. 
+Assuming the PIR is idle for the timeout period then next time it is triggered it starts again
+with UID_1f.
+Instructions to update displays or make sounds can be placed in UID_1f.  UID_1 and UID_0 scripts
+can be ignored.
+Device registration script UID_reg normally just sets the device name
+
+
+
+*************
+MAX7219CLOCK:
+*************
+
+dev UID state value1 value 2 [optional value string]
+        
+	// Value1 is the command, value2 is the value
+	// value1       value2 
+	//  1           0 to 15         Set brightness
+	//  2           1 to lots       Display pop up message for duration(seconds) value2
+	//  3           0,1 or 2        Set blink :   0=NONE, 1=fast, 2=slow, all other values 0
+	//  4           duration        flash display for value2 duration (seconds)
+
+
+The server has _reg and _dereg scripts for this type of device. The device registration script
+typically sets the device name and initial settings (brightness etc)
+
+
+
+***********
+Set YAFDP location for a device
+
+Example:
+dev A020A617D9D701 config location livingroom
+
+The location is saved locally on the device, once reset the device will pass that location text
+to the devices YAFDP server.
+
+
+
+*********************
+Variable substitution
+*********************
+Words passed to the interpreter starting with a $ may be substituted with the value of system
+variables.
+
+The state of devices are in the form of $UID_state_name.
+
+For example:
+	$FF5767A2160404_VB	- Value bytes (In this case a string containing the temperature)
+	$FF5767A2160404_V1	- Value1 of devices 'state'
+	$FF5767A2160404_V2	- Value2 of devices 'state'
+        
+	$DATE1
+	$DATE2
+	$DATE3
+	$DATE4
+	$DATE5
+	$DATEL			- date alone for log files
+	$DATE
+	$TIME			- time, 24 hour
+	
+
+
+"print" or "printcon" can be used to view variable values
+
+	> print $date
+	Sun 11 Aug 2019 13:58:07 +0100
+
+
+
+
+
+**************
+LED TEXT SIGNS
+**************
+
+6 line sign
+
+
+	value1	value2	valuebytes 	Func
+	0	0			Reset display
+	1	X	String		Display string on Line 1
+	2	X	String		Display string on Line 2 
+	65000	1..100			Set brightness percentage 1 to 100
+	65001	0..1			Set proportional text
+	65010	0			Set uppercase fixed font
+	65010	1			Set mixed case small font
+
+
+
+dev B827EBBF391E01 0 0
+dev B827EBBF391E01 state 1 0 This is the text on line 1
+dev B827EBBF391E01 state 2 0 This is the text on line 2
+dev B827EBBF391E01 state 3 0 This is the text on line 3
+dev B827EBBF391E01 state 4 0 This is the text on line 4
+dev B827EBBF391E01 state 5 0 This is the text on line 5
+dev B827EBBF391E01 state 6 0 This is the text on line 6
+
+
+
+Display temperature from sensor $BC1B... on LED display 18FE...
+dev 18FE349B9D6701 state 2 8 $BC1BCB06000014_vt
+
+Display short form temperature from two sensors on LED display 18FE....
+dev 18FE349B9D6701 state 2 10 $E1520800008086_vts $BC1BCB06000014_vts
+
+Every minute display the two temperatures for 10 seconds
+every 1m dev 18FE349B9D6701 state 2 10 $E1520800008086_vts $BC1BCB06000014_vts
+
+Every 20 seconds display two temperatures
+every 20s dev A020A617D9D701 state 2 5 $E1520800008086_vts $BC1BCB06000014_vts
+
+
+
+***************************
+Single Line scrolling signs
+***************************
+
+
+
+
+
+
+**************************
+EFFECTS
+**************************
+
+
+
+
+**************************
+Sounds
+**************************
+playsound <optional group, 0=ALL> <Volume percentage> <sample name>
+Devices subscribed to TOPIC_SAM or listening to monitor messages SAM
+will play the named sample\n")
+Optional group number allows only a subset of sound players to play a sample.
+example   playsound 0 100 doorbell3
+Everything will try and play the named sample, very loudly.
+
+
+
+
+*******************************
+Sound to light sequence scripts
+*******************************
+SEQ LIST		List of sequence scripts loaded
+SEQ LOAD <Filename>
+SEQ RUN			Run a script as if audio was being received
+
+Scripts are in ./seq/
+
+File format:
+
+MD5=<ms5 sum of audio file>
+
+TIME_INDEX	COMMAND
+		COMMAND
+		COMMAND
+TIME_INDEX	COMMAND
+etc
+
+Scripts are executed by the interpreter as audioplus arrives at the server, see "stream_audioplus"
+
+

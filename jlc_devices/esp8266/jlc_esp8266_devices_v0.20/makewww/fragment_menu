@@ -1,0 +1,49 @@
+
+<!--- fragment_menu -->
+<body bgcolor="#FFFFFF" text="#000000" leftmargin=" 0" topmargin=" 0"marginwidth=" 0" marginheight=" 0" background="backwash.jpg">
+<table width=" 100%" border=" 0" cellspacing=" 0" cellpadding=" 0">
+<tr>
+<td>
+<table width=" 100% " border=" 0" cellspacing=" 0" cellpadding=" 0">
+<tr>
+<td width=" 17"><img src="pixel.gif" width=" 17" height=" 40"></td>
+<td width=" 194">
+<img src="logo.jpg" border=" 0"></td>
+<td width=" 60"><img src="pixel.gif" width=" 60" height=" 40"></td>
+<td>
+<table width=" 100" border=" 0" cellspacing=" 0" cellpadding=" 0">
+<tr>
+<td><a href="index.cgi" class="type2" target="_self">&nbsp;&nbsp;CONTROL&nbsp;&nbsp;</a></td>
+<td><a href="settings.cgi" class="type2" target="_self">&nbsp;&nbsp;SETTINGS&nbsp;&nbsp;</a></td>
+<td><a href="help.cgi" class="type2" target="_self">&nbsp;&nbsp;HELP&nbsp;&nbsp;</a></td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+
+
+<tr>
+<td>
+<table width=" 100%" border=" 0" cellspacing=" 0" cellpadding=" 0">
+<tr>
+<td width=" 17"><img src="pixel.gif" width=" 17" height=" 17"></td>
+<td width=" 123"><img src="pixel.gif" width=" 123" height=" 17"></td>
+<td>
+<table width=" 100" border=" 0" cellspacing=" 0" cellpadding=" 0">
+<tr>
+<td></a></td>
+<td></a></td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+
+
+</table>
+

@@ -1,0 +1,22 @@
+CC ?= gcc
+PKGCONFIG = $(shell which pkg-config)
+CFLAGS = $(shell $(PKGCONFIG) --cflags gtk+-3.0) -Iinclude -DGUIGTK -DLINUX -g
+LIBS = $(shell $(PKGCONFIG) --libs gtk+-3.0)
+
+SRC = jlc_linuxgui.c jlc_binmsg.c jlc_linuxgui_tcp.c wavplay.c parse_commandline.c jlc_gui.c jlc_gui_gtk.c
+
+OBJS = $(SRC:.c=.o)
+
+all: jlc_linuxgui_bin_gtk 
+
+%.o: %.c
+	$(CC) -c -o $(@F) $(CFLAGS) $<
+
+jlc_linuxgui_bin_gtk: $(OBJS)
+	$(CC) -o $(@F) $(OBJS) $(LIBS)
+
+clean:
+	rm -f $(OBJS)
+	#rm -f 
+
+

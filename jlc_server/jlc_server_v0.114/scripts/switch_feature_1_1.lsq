@@ -1,0 +1,3 @@
+# When switch feature activates (push and hold on sonoff T1) and group is on
+pir lockout 16 1
+

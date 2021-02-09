@@ -1,0 +1,2975 @@
+This is xforms.info, produced by makeinfo version 6.7 from xforms.texi.
+
+INFO-DIR-SECTION Development
+START-INFO-DIR-ENTRY
+* XForms: (xforms). A Graphical user interface toolkit for X
+END-INFO-DIR-ENTRY
+
+
+File: xforms.info,  Node: Tint,  Next: Rotation,  Prev: Convolution,  Up: Simple Image Processing
+
+37.7.2 Tint
+-----------
+
+Tint as implemented in the Forms Library emulates the effect of looking
+at an image through a piece of colored glass.  You can specify the color
+and transparency of the glass:
+     int flimage_tint(FL_IMAGE *im, unsigned int packed, double opacity);
+where the parameter 'packed' is a packed RGB color, specifying the color
+of the glass.  'opacity' specifies how much the color of the image is
+absorbed by the glass.  A value of 0 means the glass is totally
+transparent, i.e., the glass has no effect3, while a value of 1.0 means
+total opaqueness, i.e., all you see is the color of the glass.  Any
+value between these two extremes results in a color that is a
+combination of the pixel color and the glass color.  For example, to
+tint a part of the image bluish, you can set 'packed' to
+'FL_PACK(0,0,200)' and use an opacity of 0(1).
+
+Tint is most useful in cases where you want to put some annotations on
+the image, but do not want to use a uniform and opaque background that
+completely obscures the image behind.  By using tint, you can have a
+background that provides some contrast to the text, yet not obscures the
+image beneath completely.
+
+Tint operation uses the subimage settings.
+
+   ---------- Footnotes ----------
+
+   (1) Strictly speaking, a piece of glass that is totally transparent
+can't have colors.
+
+
+File: xforms.info,  Node: Rotation,  Next: Image Flipping,  Prev: Tint,  Up: Simple Image Processing
+
+37.7.3 Rotation
+---------------
+
+Image rotation can be easily done with the following routine
+     int flimage_rotate(FL_IMAGE *im, int angle, int subpixel);
+where 'angle' is the angle in one-tenth of a degree (i.e., a 45 degree
+rotation should be specified as 450) with a positive sign for
+counter-clock rotation.  The parameter 'subpixel' should be one of the
+following, specifying if subpixel sampling should be enabled.  It can be
+set to either 'FLIMAGE_NOSUBPIXEL' or 'FLIMAGE_SUBPIXEL'.
+
+If subpixel sampling is enabled, the resulting image pixels are
+interpolated from the original pixels.  This usually has an
+"anti-aliasing" effect that leads to less severe jagged edges and
+similar artifacts commonly encountered in rotations.  However, it also
+means that a color indexed image gets converted to a RGB image.  If
+preserving the pixel value is important, you should not turn subpixel
+sampling on.
+
+'*note flimage_rotate()::' return a negative number if it for some
+reason (usually due to running out of memory) fails to perform the
+rotation.
+
+Since the rotated image has to be on a rectangular grid, the regions
+that are not occupied by the image are filled with a fill color, where
+the default is black.  If a different fill color is desired you can set
+the 'image->fill_ccolor' field to a packed RGB color before calling the
+rotation function.  Note that even for color indexed images the fill
+color should be specified in RGB. The rotation function will search the
+colormap for the appropriate index if no subpixel sampling is used.
+
+Repeated rotations should be avoided if possible.  If you have to call
+it more than once it's a good idea to crop after rotations in order to
+get rid of the regions that contain only fill color.
+
+
+File: xforms.info,  Node: Image Flipping,  Next: Cropping,  Prev: Rotation,  Up: Simple Image Processing
+
+37.7.4 Image Flipping
+---------------------
+
+Image flipping refers to the mirror operation in x- or y-direction at
+the center.  For example, to flip the columns of an image, the left and
+right of the image are flipped (just like having a vertical mirror in
+the center of the image) thus the first pixel on any given row becomes
+the last, and the last pixel becomes the first etc.
+
+The API for flipping is as follows
+     int flimage_flip(FL_IMAGE *im, int what);
+where 'what' can be ''c'' or ''r''.  indicating if column and row
+flipping is desired.
+
+
+File: xforms.info,  Node: Cropping,  Next: Scaling,  Prev: Image Flipping,  Up: Simple Image Processing
+
+37.7.5 Cropping
+---------------
+
+There are two functions available to crop an image
+     int flimage_autocrop(FL_IMAGE *im, unsigned int background);
+     int flimage_crop(FL_IMAGE *im, int xl, int yt, int xr, int yb);
+
+The first function, as its name suggests, automatically crops an image
+using the background as the color to crop.  The function works by
+searching the image from all four sides and removing all contiguous
+regions of the uniform background from the sides.  The image is modified
+in place.  If cropping is successful, a non-negative integer is
+returned, otherwise -1.  If 'background' is specified as the constant
+'FLIMAGE_AUTOCOLOR', the background is chosen as the first pixel of the
+image.
+
+The second function uses the parameters supplied by the user to crop the
+image.  'xl' and 'xr' are the offsets into the image from the left and
+the right sides, respectively, i.e., if both 'xl' and 'xr' are 1, the
+cropping removes the first column and the last column from the image.
+Parameters 'yt' and 'yb' specify the offsets into the image from the top
+and bottom of the image respectively.
+
+Note the offsets do not have to be positive.  When they are negative,
+they indicate enlargement of the image.  The additional regions are
+filled with the uniform color specified by 'image->fill_color', a packed
+RGB color.  This can be quite useful to add a couple of pixels of border
+to an image.  For example, the following adds a 1 pixel wide yellow
+border to an image
+     image->fill_color = FL_PACK(255,255,0);
+     flimage_crop(image, -1, -1, -1, -1);
+
+Another function is available that can be used to obtain the
+auto-cropping offsets
+     int flimage_get_autocrop(FL_IMAGE *im, unsigned background,
+                              int *xl, int *yt, int *xl, int *yb);
+This function works the same way as '*note flimage_autocrop()::', except
+that no actual cropping is performed.  Upon function return the
+parameters 'xl', 'yt', 'xl' and 'yb' are set to the offsets found by the
+function.  The application can then make adjustment to these offsets and
+call '*note flimage_crop()::'.
+
+
+File: xforms.info,  Node: Scaling,  Next: Warping,  Prev: Cropping,  Up: Simple Image Processing
+
+37.7.6 Scaling
+--------------
+
+An image can be scaled to any desired size with or without subpixel
+sampling.  Without subpixel sampling simple pixel replication is used,
+otherwise a box average algorithm is employed that yields an
+anti-aliased image with much less artifacts.  A special option is
+available that scales the image to the desired size but keeps the aspect
+ratio of the image the same by filling the part of the image that would
+otherwise be empty.
+
+The main entry point to the scaling function is
+     int flimage_scale(FL_IMAGE *im, int newwidth, int newheight,
+                       int option);
+where the parameters 'newwidth' and 'newheight' specify the desired
+image size.  Parameter 'option'q can be one of the following constants
+or the bitwise OR of them:
+'FLIMAGE_NOSUBPIXEL'
+     scale the image with no subpixel sampling
+'FLIMAGE_SUBPIXEL'
+     scale the image with subpixel sampling
+'FLIMAGE_ASPECT'
+     scale the image with no aspect ratio change
+'FLIMAGE_CENTER'
+     center the scaled image if aspect
+'FLIMAGE_NOCENTER'
+     do not center the scaled image
+
+For example, 'FLIMAGE_ASPECT|FLIMAGE_SUBPIXEL' requests fitting the
+image to the new size with subpixel sampling.  'FLIMAGE_ASPECT'
+specifies a scaling that results in an image of the requested size (even
+if the scales are different for width and height) without changing the
+aspect ratio of the original image by filling in the stretched regions
+with the fill color 'image->fill_color', a packed RGB color:
+
+     im->fill_color = FL_PACK(255,0,0);
+     flimage_scale(im, im->w+2, im->h, FLIMAGE_SUBPIXEL|FLIMAGE_ASPECT);
+This code generates an image that is two pixels wider than the original
+image but with the same aspect ratio.  The two additional pixel columns
+on each side of the image are filled with the fill color (red), yielding
+a red border.  The fitting can be useful in turning a series of images
+of unequal sizes into images of equal sizes with no perceptible change
+in image quality.
+
+Depending on what the application requires, simple scaling (zooming)
+with no subpixel sampling is much faster than box averaging or blending,
+but subpixel sampling tends to yield smoother images with less scaling
+artifacts.
+
+
+File: xforms.info,  Node: Warping,  Next: General Pixel Transformation,  Prev: Scaling,  Up: Simple Image Processing
+
+37.7.7 Warping
+--------------
+
+Image warping (or texture mapping in 2D) refers to the transformation of
+pixel coordinates.  Rotation, scaling and shearing etc.  are examples of
+(linear and non-perspective) image warping.  In typical applications
+some of the commonly used pixel coordinate transformations are
+implemented using more efficient algorithms instead of a general
+warping.  For example, image rotation is often implemented using three
+shears rather than a general warp (Forms Library implements rotation via
+image warping).
+
+Non-perspective linear image warping in general is characterized by a
+2x2 warp matrix 'W' and a translation vector 'T' with two elements as
+follows
+            P' = W * P + T
+where 'P' is a vector describing a position via it's x and y coordinates
+and 'P'' is the position after warping.
+
+The elements 'w[i][j]' of the warp matrix are constants (if the warp
+matrix isn't constant or is of higher order, we usually call such a
+transformation morphing rather than warping).  Since our destination for
+the warped image is an array of pixels rather than a properly defined
+coordinate system (such as a window) the translation has no meaning.
+For the following discussion, we assume the translation vector is zero.
+(In doing the actual warping, the warped image is indeed shifted so it
+starts at the (0,0) element of the array representing it).
+
+Although, theoretically, any 2D matrix can be used as a warp matrix,
+there are practical constraints in image warping due to the discreteness
+of pixel coordinates.  First of all, we have to snap all pixel
+coordinates onto a 2D rectangular integer grid.  This in general will
+leave holes in the warped image because two pixels may get mapped to a
+single destination location, leaving a hole in the destination image.
+Secondly, truncation or rounding the resulting floating point values
+introduces errors.  Because of these reasons, image warping is performed
+in reverse.  That is, instead of looping over all pixel coordinates in
+the original image and transforming those into new coordinates, we start
+from the new coordinates and use inverse warping to obtain the
+coordinates of the pixel in the original image.  This requires that the
+inverse of the warp matrix must exist (which is the case if 'w[0][0] *
+w[1][1] != w[0][1] * w[1][0]', i.e., the warp matrix has a non-vanishing
+determinante).  With inverse warping the transformation becomes a
+re-sampling of the original image, and subpixel sampling (anti-aliasing)
+can be easily implemented.
+
+The following function is available in the library to perform warping
+     int flimage_warp(FL_IMAGE *im, float matrix[][2],
+                      int neww, int newh, int subpixel);
+where 'matrix' is the warp matrix.  'neww' and 'newh' specify the warped
+image size.  To have the warp function figure out the minimum enclosing
+rectangle of the warped image you can pass zeros for the new width and
+height.  Nevertheless, you can specify whatever size you want and the
+warp function will fill the empty grid location with the fill color.
+This is how the aspect ratio preserving scaling is implemented.
+
+In general, the warped image will not be rectangular in shape.  To make
+the image rectangular the function fills the empty regions.  The fill
+color is specified by setting the 'image->fill_color' field with a
+packed RGB color.
+
+The last argument, 'subpixel' specifies if subpixel sampling should be
+used.  Although subpixel sampling adds processing time, it generally
+improves image quality significantly.  The valid values for this
+parameter is any logical OR of 'FLIMAGE_NOSUBPIXEL', 'FLIMAGE_SUBPIXEL'
+and 'FLIMAGE_NOCENTER'.
+
+'FLIMAGE_NOCENTER' is only useful if you specify an image dimension that
+is larger than the warped image, and in that case the warped image is
+flushed top-left within the image grid, otherwise it is centered.
+
+To illustrate how image warping can be used, we show how an image
+rotation by an angle 'deg' can be implemented:
+     float m[2][2];
+     m[0][0] = m[1][1] = cos(deg * M_PI / 180.0);
+     m[0][1] = sin(deg * M_PI / 180.0);
+     m[1][0] = -m[0][1];
+
+     flimage_warp(im, mat, 0, 0, FLIMAGE_SUBPIXEL);
+Please note that the transformation is done in-place, i.e., after the
+function returns the image structure pointer, 'im', points to the
+rotated image.
+
+If you specify a warp matrix with the off-diagonal elements being zero
+(scaling matrix), the image will only be scaled (in x-direction by
+'m[0][0]' and in y-direction by 'm[1][1]') without being also rotated.
+
+By experimenting with various warp matrices you can obtain some
+interesting images.  Just keep in mind that large values of the warp
+matrix elements tend to make the final image larger.
+
+
+File: xforms.info,  Node: General Pixel Transformation,  Next: Image Annotation,  Prev: Warping,  Up: Simple Image Processing
+
+37.7.8 General Pixel Transformation
+-----------------------------------
+
+Many image processing tasks can be implemented as seperate RGB
+transformations.  These transformations can be done very efficiently
+through the use of lookup tables.  For this reason the following routine
+exists:
+     int flimage_transform_pixels(FL_IMAGE *im, int *red,
+                                  int *green, int *blue);
+where 'red', 'green' and 'blue' are the lookup tables of a length of at
+least 'FL_PCMAX + 1' (typically 256).  The function returns a postive
+number on success and the image will be replaced.  Note that this
+routine notices the settings of the subimage, i.e., you can transform a
+portion of the image.
+
+To illustrate the use of this routine let's look at how a simple
+contrast adjustment may be implemented:
+     #include <forms.h>
+     #include <math.h>
+
+     int AdjustContrast(FL_IMAGE *im) {
+         int r[FL_PCMAX+1],
+             g[FL_PCMAX+1],
+             b[FL_PCMAX+1];
+         int i,
+             scale = 10;
+
+         /* in this example rgb are adjusted the same way */
+         for ( i = 0; i <= FL_PCMAX; i++)
+             r[i] = g[i] = b[i] = i * log10(1 + i * scale / FL_PCMAX )
+                                  / log10( 1 + scale );
+
+         return flimage_transform_pixels(im, r, g, b);
+     }
+
+
+File: xforms.info,  Node: Image Annotation,  Next: Write Your Own Routines,  Prev: General Pixel Transformation,  Up: Simple Image Processing
+
+37.7.9 Image Annotation
+-----------------------
+
+You can annotate an image with text or simple markers (arrows etc.).
+The location of the annotation can either be in pixel coordinate system
+or some application defined coordinate system.
+
+* Menu:
+
+* Using Text Strings::
+* Using Markers::
+* Pixelizing the Annotation::
+
+
+File: xforms.info,  Node: Using Text Strings,  Next: Using Markers,  Up: Image Annotation
+
+37.7.9.1 Using Text Strings
+...........................
+
+To place text into the image, use the following routine
+     int flimage_add_text(FL_IMAGE *im, const char *str, int len,
+                          int fstyle, int fsize, unsigned tcolor,
+                          unsigned bcolor, int nobk, double tx,
+                          double ty, int rotation);
+where 'fstyle' and 'fsize' are the same as the label font style and size
+defined earlier in Section 3.11.3.  'tcolor' and 'bcolor' specify the
+colors to use for the text 'str' and the background if the 'nobk'
+argument is false.  If 'nobk' is true the text is drawn without a
+background.  'tx' and 'ty' specify the location of the text relative to
+the image origin.  The location specified is the lower-right corner of
+the text.  Note that the location specified can be in some physical
+space other than pixel space.  For example, if the pixel-pixel distance
+represents 10 miles on a map, you'd like to be able to specify the text
+location in miles rather than pixels.  The location is converted into
+pixel space using the following code
+         tx_pixel = im->xdist_scale * tx + im->xdist_offset;
+         ty_pixel = im->ydist_scale * ty + im->ydist_offset;
+By default, the offsets 'im->xdist_offset' and 'im->yxdist_offset' are
+initialized to 0 and the scales 'im->xdist_scale' and 'im->ydist_scale'
+to 1.
+
+The function returns the current number of strings for the image.  The
+interpretation of text used also used elsewhere applies, i.e., if 'str'
+starts with character '@' a symbol is drawn.
+
+There is another function, maybe more convenient depending on the
+application, that you can use
+     int flimage_add_text_struct(FL_IMAGE *im,
+                                 const FLIMAGE_TEXT *text);
+With this function instead of passing all the parameters individual;y
+you pass a 'FLIMAGE_TEXT' structure to the function.  The structure has
+the following fields:
+'str'
+     The string to append to the image.
+'len'
+     Length of the string in bytes.
+'x, y'
+     A location relative to the image origin, given in pixels (no
+     conversion from other coordinate systems is done)
+'align'
+     Specifies the alignment of the string relative to the give
+     location.
+'style, size'
+     The font style and size to use.
+'color'
+     The text color
+'bcolor'
+     The background color
+'nobk'
+     If true indicates that no background is to be drawn.
+'angle'
+     Angle (in thenth of a degree) the text is to be rotated from the
+     default horizontal orientation.  Currently only PostScript output
+     handles this correctly.
+
+To delete the all texts you added to an image, use
+     void flimage_delete_all_text(FL_IMAGE *im);
+
+You also can suppress the display of annotation text without deleting
+it.  To do this, simply set 'im->dont_display_text' to true.
+
+
+File: xforms.info,  Node: Using Markers,  Next: Pixelizing the Annotation,  Prev: Using Text Strings,  Up: Image Annotation
+
+37.7.9.2 Using Markers
+......................
+
+In addition to text strings you can also add simple markers (arrows,
+circles etc) to your image.
+
+To add a marker to an image use the following routines
+     int flimage_add_marker(FL_IMAGE *im, const char *name,
+                            double x, double y, double w, double h,
+                            int linestyle, int fill, int rotation,
+                            FL_COLOR, FL_COLOR bcol);
+     int flimage_add_marker_struct(FL_IMAGE *im, const FLIMAGE_MARKER *m);
+where 'name' is the marker name (see below for a list of built-in
+markers).  The marker name must consist of regular ASCII characters.
+'linestyle' indicates the line style ('FL_SOLID', 'FL DOT' etc., see
+Chapter 27 for a complete list.  'fill' indicates if the marker should
+be filled or not.  'x' and 'y' are the coordinates of the center of the
+marker in physical coordinates (i.e., the same transformation as
+described above for annotated texts is applied), 'w' and 'h' are the
+size of the bounding box of the marker, again in physical coordinates.
+Every marker has a natural orientation from which you can rotate it.
+The angle of rotation is given by 'rotation' in tenth of a degree.
+'col' is the color of the marker, in packed RGB format.  'bcol' is
+currently un-used.
+
+The second function takes a structure that specifies the marker.  The
+members of the structure are as follows:
+'name'
+     The name of the marker.
+'x, y'
+     Position of center of the marker in pixel coordinates, relative to
+     the origin of the image.
+'w, h'
+     The size of the bounding box in pixel coordinates.
+'color'
+     The color of the marker in packed RGB format.
+'fill'
+     If true the marker is filled.
+'thickness'
+     The line line thickness used for drawing.
+'style'
+     The line style to be used for drawing.
+'angle'
+     Angle of rotation in tenth of a degree from the marker's nature
+     orientation.
+
+If successful both functions return the number of markers that are
+currently associated with the image, otherwise a negative number.
+
+Some built-in markers in different orientations are shown in Fig.  22.1.
+
+To delete all markers added to an image use the function
+     void flimage_delete_all_markers(FL_IMAGE *im);
+
+Of course the library would not be complete without the ability for
+applications to define new markers.  The following function is provided
+so you can define your own markers:
+     int flimage_define_marker(const char *name,
+                               void (*draw) (FLIMAGE_MARKER *marker),
+                               const char *psdraw);
+When the marker is to be drawn the function 'draw()' is called with the
+marker structure.  In addition to the fields listed above the following
+fields are filled by the library to facilitate the operation of drawing
+the marker
+'display'
+     The display to be drawn on.
+'gc'
+     The GC to be used in drawing
+'win'
+     The window to draw to.
+'psdraw'
+     A string that draws a marker in a square with the corner
+     coordinates (-1, -1), (-1, 1), (1, 1) and (1, -1) in PostScript.
+     For example the rectangle marker has the following 'psdraw' string:
+               -1 -1 moveto
+               -1  1 lineto
+                1  1 lineto
+                1 -1 lineto
+                closepath
+
+Defining new markers is the preferred method of placing arbitary
+drawings onto an image as it works well with double-buffering and
+pixelization of the markers.
+
+
+File: xforms.info,  Node: Pixelizing the Annotation,  Prev: Using Markers,  Up: Image Annotation
+
+37.7.9.3 Pixelizing the Annotation
+..................................
+
+Annotations placed on the image are kept seperate from the image pixels
+themselves.  The reasons for doing so are twofold.  First, keeping the
+annotation seperate makes it possible to later edit the annotations.
+The second reason is that typically the screen has a lower resolutions
+than other output devices.  By keeping the annotations seperate from the
+pixels makes it possible to obtain better image qualities when the
+annotations are rendered on higher-resolution devices (for example a
+PostScript printer).
+
+If for some reason making the annotations a part of the image pixels is
+desired, use the following routine
+     int flimage_render_annotation(FL_IMAGE *image, FL_WINDOW win);
+The function returns -1 if an error occurs.  The parameter 'win' is used
+to create the appropriate pixmap.  After the function returns the
+annotations are rendered into the image pixels (thus an annotation or a
+part of it that was outside of the image is lost).  Note that during
+rendering the image type may change depending on the capabilities of
+'win'.  Annotations that were kept separately are deleted.  Note that
+the image must have been displayed at least once prior to calling this
+function for it to work correctly.
+
+You can always enlarge the image first via the cropping function with
+some solid borders.  Then you can put annotation outside of the original
+image but within the enlarged image.
+
+Not all image formats support the storage of text and markers.  This
+means if you attempt to save an image that has associated text and
+markers into an image format that does not support it, you may lose the
+annotation.  All pnm formats supports the storage of annotations.  To
+find out if a particular format supports annotation storage, look at the
+annotation field of the 'FLIMAGE_FORMAT_INFO' structure.  A zero value
+indicates it does not support it.
+
+
+File: xforms.info,  Node: Write Your Own Routines,  Prev: Image Annotation,  Up: Simple Image Processing
+
+37.7.10 Write Your Own Routines
+-------------------------------
+
+The only communication required between an image processing routine and
+the rest of the image routines is to let the display routine know that
+the image has been modified by setting 'image->modified' to 1.  This
+information is used by the display routine to invalidate any buffered
+displayable images that were created from the original image.  After
+displaying, 'image->modified' is reset by the display routine.
+
+
+File: xforms.info,  Node: Utilities,  Prev: Simple Image Processing,  Up: Part VI Images
+
+37.8 Utilities
+==============
+
+In the following some of the utilities that may come in handy when
+you're writing image manipulation routines are described.
+
+* Menu:
+
+* Memory Allocation::
+* Color Quantization::
+* Remarks::
+
+
+File: xforms.info,  Node: Memory Allocation,  Next: Color Quantization,  Up: Utilities
+
+37.8.1 Memory Allocation
+------------------------
+
+To create a matrix to be used in several of the functions listed above
+use either '*note fl_get_matrix()::' described above or
+     void *fl_make_matrix(int nrow, int ncol, unsigned int esize,
+                           void *inMem);
+where 'nrow' and 'ncol' are the number of rows and columns of the matrix
+respectively.  'esize' is the size (in bytes) of each matrix element.
+
+Both functions return a two-dimensional array of entities of size
+'esize'.  The first function initializes all elements to zero.  The
+second function does not allocate nor initialize memory for the matrix
+itself.  Instead it uses the memory with address 'inMem' that is
+supplied by the caller, which should be a one-dimensional array of
+length 'nrow * ncol * esize'.
+
+You can use the returned pointer as a regular two-dimensional array
+('matrix[r][c]') or as a single array of length 'nrow *ncol', starting
+from at 'matrix[0]':
+     short **matrix = fl_get_matrix(nrow, ncol, sizeof **matrix);
+
+     /* access the matrix as a 2-d array */
+     matrix[3][4] = 5;
+
+     /* or access it as 1D array */
+     *(matrix[0] + 3 * ncol + 4) = 5;
+
+     /* most useful in image processing to use it as 1D array */
+
+     memcpy(saved, matrix, nrow * ncol * sizeof **matrix);
+
+To free a matrix allocated using one the above functions, use
+     void fl_free_matrix(void *matrix);
+The function frees all memory allocated.  After the function returns the
+matrix cab not be de-referenced anymore.  In the case where the matrix
+was created by '*note fl_make_matrix()::' the function will only free
+the memory that's allocated to hold the matrix indices but not the
+memory supplied by the caller.  It is the caller's responsibility to
+free that part of the memory.
+
+There are also some useful functions that manipulate images directly.
+The following is a brief summary of them.
+
+     FL_IMAGE *flimage_dup(FL_IMAGE *im);
+This function duplicates an image 'im' and returns the duplicated image.
+At the moment, only the first image is duplicated even if the input
+image has multiple frames.  Furthermore, markers and annotations are not
+duplicated.
+
+     Pixmap flimage_to_pixmap(FL_IMAGE *im, FL_WINDOW win);
+     int flimage_from_pixmap(FL_IMAGE *im, Pixmap pixmap);
+
+The first function converts an image into a Pixmap (a server side
+resource) that can be used in the pixmap object (see pixmap-class???).
+
+The second function does the reverse.  'im' must be a properly allocated
+image.
+
+
+File: xforms.info,  Node: Color Quantization,  Next: Remarks,  Prev: Memory Allocation,  Up: Utilities
+
+37.8.2 Color Quantization
+-------------------------
+
+In order to display a RGB image on a color-mapped device of limited
+depth, the number of colors in the original image will have to be
+reduced.  Color quantization is one way of doing this.
+
+Two color quantization algorithms are available in the Forms Library.
+One uses Heckbert's median cut algorithm followed by Floyd-Steinberg
+dithering after which the pixels are mapped to the colors selected.  The
+code implementing this is from the Independent JPEG Group's two pass
+quantizer ('jquant2.c' in the IJG's distribution), which under copyright
+(c) 1991-1996 by Thomas G. Lane and the IJG.
+
+Another method is based on the Octree quantization algorithm with no
+dithering and is implemented by Steve Lamont ('spl@ucsd.edu') and is
+under vopyright (c) 1998 by Steve Lamont and the National Center for
+Microscopy and Imaging Research.  This quantization library is available
+from <ftp://ncmir.ucsd.edu/pub/quantize/libquantize.html>.  The
+quantizer based on this library is not compiled into the image support.
+The source code for using this quantizer is in 'image' subdirectory.
+
+By default, the median cut algorithm is used.  You can switch to the
+octree based algorithm using the following call
+     void flimage_select_octree_quantizer(void);
+
+To switch back to the median cut quantizer use
+     void flimage_select_mediancut_quantizer(void);
+
+The median-cut quantizer tends to give better images because of the
+dithering step.  However, in this particular implementation, the number
+of quantized colors is limited to 256.  There is no such limit with the
+octree quantizer implementation.
+
+
+File: xforms.info,  Node: Remarks,  Prev: Color Quantization,  Up: Utilities
+
+37.8.3 Remarks
+--------------
+
+See 'itest.c' and 'ibrowser.c' for example use of the image support in
+Forms Library.  'iconvert.c' is a program that converts between
+different file formats and does not require an X connection.
+
+Due to access limitations, not all combinations of display depth and
+bits per pixel (bpp) are tested.  Depths of 1 bit (1 bpp), 4 bits
+(8 bpp), 8 bits (8 bpp), 16 bits (16 bpp), 24 bits (32 bpp), 30 bits
+(32 bpp) were tested.  Although it works in 12 bit PseudoColor mode, due
+to limitations of the default quantizer the display function does not
+take full advantage of the larger lookup table.  Special provisions were
+made so a gray12 image will be displayed in 4096 shades of gray if the
+hardware supports 12-bit grayscale.
+
+If JPEG support ('image_jpeg.c') is not compiled into the Forms Library,
+you can obtain the jpeg library source from
+<ftp://ftp.uu.net/graphics/jpeg>.
+
+
+File: xforms.info,  Node: Index of Functions,  Next: Index of Global Variables,  Prev: Part VI Images,  Up: Top
+
+Index of Functions
+******************
+
+ [index ]
+* Menu:
+
+* flimage_add_format():                  Adding New Formats.  (line  12)
+* flimage_add_marker():                  Using Markers.       (line   9)
+* flimage_add_marker_struct():           Using Markers.       (line   9)
+* flimage_add_text():                    Using Text Strings.  (line   6)
+* flimage_add_text_struct():             Using Text Strings.  (line  33)
+* flimage_alloc():                       Creating Images.     (line  14)
+* flimage_autocrop():                    Cropping.            (line   6)
+* flimage_close():                       Setup and Configuration.
+                                                              (line 137)
+* flimage_convert():                     Supported image types.
+                                                              (line  63)
+* flimage_convolve():                    Convolution.         (line   6)
+* flimage_convolvea():                   Convolution.         (line  16)
+* flimage_crop():                        Cropping.            (line   6)
+* flimage_define_marker():               Using Markers.       (line  59)
+* flimage_delete_all_markers():          Using Markers.       (line  54)
+* flimage_delete_all_text():             Using Text Strings.  (line  62)
+* flimage_description_via_filter():      Adding New Formats.  (line 162)
+* flimage_display():                     The Basic Image Support API.
+                                                              (line  68)
+* flimage_dump():                        The Basic Image Support API.
+                                                              (line  32)
+* flimage_dup():                         Memory Allocation.   (line  47)
+* flimage_enable_bmp():                  Built-in support.    (line  35)
+* flimage_enable_fits():                 Built-in support.    (line  35)
+* flimage_enable_genesis():              Built-in support.    (line  35)
+* flimage_enable_gif():                  Built-in support.    (line  35)
+* flimage_enable_gzip():                 Built-in support.    (line  35)
+* flimage_enable_jpeg():                 Built-in support.    (line  35)
+* flimage_enable_png():                  Built-in support.    (line  35)
+* flimage_enable_pnm():                  Built-in support.    (line  35)
+* flimage_enable_ps():                   Built-in support.    (line  35)
+* flimage_enable_sgi():                  Built-in support.    (line  35)
+* flimage_enable_tiff():                 Built-in support.    (line  35)
+* flimage_enable_xbm():                  Built-in support.    (line  35)
+* flimage_enable_xpm():                  Built-in support.    (line  35)
+* flimage_enable_xwd():                  Built-in support.    (line  35)
+* flimage_error():                       Setup and Configuration.
+                                                              (line  83)
+* flimage_flip():                        Image Flipping.      (line  12)
+* flimage_free():                        The Basic Image Support API.
+                                                              (line  62)
+* flimage_from_pixmap():                 Memory Allocation.   (line  53)
+* flimage_getmem():                      Creating Images.     (line  35)
+* flimage_get_autocrop():                Cropping.            (line  36)
+* flimage_get_format_info():             Queries.             (line  14)
+* flimage_get_number_of_formats():       Queries.             (line  10)
+* flimage_gif_output_options():          Built-in support.    (line  67)
+* flimage_is_supported():                The Basic Image Support API.
+                                                              (line 148)
+* flimage_jpeg_output_options():         Built-in support.    (line  50)
+* flimage_load():                        The Basic Image Support API.
+                                                              (line  32)
+* flimage_open():                        Setup and Configuration.
+                                                              (line 125)
+* flimage_pnm_output_options():          Built-in support.    (line  61)
+* flimage_ps_options():                  Built-in support.    (line  72)
+* flimage_read():                        Setup and Configuration.
+                                                              (line 130)
+* flimage_render_annotation():           Pixelizing the Annotation.
+                                                              (line  16)
+* flimage_rotate():                      Rotation.            (line   6)
+* flimage_scale():                       Scaling.             (line  14)
+* flimage_sdisplay():                    The Basic Image Support API.
+                                                              (line  68)
+* flimage_select_mediancut_quantizer():  Color Quantization.  (line  29)
+* flimage_select_octree_quantizer():     Color Quantization.  (line  26)
+* flimage_setup():                       Setup and Configuration.
+                                                              (line  17)
+* flimage_tint():                        Tint.                (line   8)
+* flimage_to_pixmap():                   Memory Allocation.   (line  53)
+* flimage_transform_pixels():            General Pixel Transformation.
+                                                              (line   9)
+* flimage_type_name():                   Supported image types.
+                                                              (line  59)
+* flimage_warp():                        Warping.             (line  49)
+* flimage_windowlevel():                 Supported image types.
+                                                              (line  51)
+* flimage_write_via_filter():            Adding New Formats.  (line 162)
+* flps_init():                           Object Attributes.   (line 286)
+* fl_activate_all_forms():               Dealing With Multiple Windows.
+                                                              (line  44)
+* fl_activate_all_forms() <1>:           Doing Interaction.   (line 255)
+* fl_activate_event_callbacks():         Using Callback Functions.
+                                                              (line 121)
+* fl_activate_event_callbacks() <1>:     Doing Interaction.   (line 324)
+* fl_activate_form():                    Dealing With Multiple Windows.
+                                                              (line  20)
+* fl_activate_form() <1>:                Doing Interaction.   (line 251)
+* fl_activate_glcanvas():                OpenGL Canvas.       (line  56)
+* fl_activate_object():                  Deactivating and Triggering Objects.
+                                                              (line  13)
+* fl_activate_object() <1>:              Doing Interaction.   (line 277)
+* fl_addtopup():                         Creating XPopups.    (line 136)
+* fl_addto_browser():                    Other Browser Routines.
+                                                              (line  22)
+* fl_addto_browser_chars():              Other Browser Routines.
+                                                              (line  31)
+* fl_addto_browser_chars_f():            Other Browser Routines.
+                                                              (line  31)
+* fl_addto_browser_f():                  Other Browser Routines.
+                                                              (line  22)
+* fl_addto_choice():                     Other Choice Routines.
+                                                              (line   7)
+* fl_addto_choice_f():                   Other Choice Routines.
+                                                              (line   7)
+* fl_addto_command_log():                Command Log.         (line  86)
+* fl_addto_command_log_f():              Command Log.         (line  86)
+* fl_addto_form():                       Adding and Removing Objects.
+                                                              (line   9)
+* fl_addto_form() <1>:                   Creating Forms.      (line  67)
+* fl_addto_formbrowser():                Other FormBrowser Routines.
+                                                              (line   6)
+* fl_addto_group():                      Grouping Objects.    (line  36)
+* fl_addto_group() <1>:                  Creating Forms.      (line  67)
+* fl_addto_menu():                       Other Menu Routines. (line  46)
+* fl_addto_selected_xevent():            Using Callback Functions.
+                                                              (line 133)
+* fl_addto_tabfolder():                  Other Folder Routines.
+                                                              (line   6)
+* fl_add_bitmap():                       Adding Bitmap Objects.
+                                                              (line   6)
+* fl_add_bitmapbutton():                 Adding Button Objects.
+                                                              (line   6)
+* fl_add_box():                          Boxes.               (line   9)
+* fl_add_box() <1>:                      Adding Box Objects.  (line   6)
+* fl_add_browser():                      Adding Browser Objects.
+                                                              (line   6)
+* fl_add_browser_line():                 Other Browser Routines.
+                                                              (line  12)
+* fl_add_browser_line_f():               Other Browser Routines.
+                                                              (line  12)
+* fl_add_button():                       Buttons.             (line  12)
+* fl_add_button() <1>:                   Adding Button Objects.
+                                                              (line   6)
+* fl_add_button_class():                 Part IV New Buttons. (line  72)
+* fl_add_canvas():                       Adding Canvas Objects.
+                                                              (line   6)
+* fl_add_canvas_handler():               Canvas Interaction.  (line  21)
+* fl_add_chart():                        Adding Chart Objects.
+                                                              (line   6)
+* fl_add_chart_value():                  Other Chart Routines.
+                                                              (line  10)
+* fl_add_checkbutton():                  Adding Button Objects.
+                                                              (line   6)
+* fl_add_child():                        Part IV The Type FL_OBJECT.
+                                                              (line 362)
+* fl_add_choice():                       Adding Choice Objects.
+                                                              (line   6)
+* fl_add_clock():                        Adding Clock Objects.
+                                                              (line   6)
+* fl_add_counter():                      Adding Counter Objects.
+                                                              (line   6)
+* fl_add_dial():                         Adding Dial Objects. (line   6)
+* fl_add_event_callback():               Using Callback Functions.
+                                                              (line 100)
+* fl_add_event_callback() <1>:           Doing Interaction.   (line 309)
+* fl_add_formbrowser():                  Adding FormBrowser Objects.
+                                                              (line   6)
+* fl_add_frame():                        Adding Frame Objects.
+                                                              (line   6)
+* fl_add_free():                         Free Object.         (line   6)
+* fl_add_fselector_appbutton():          File Selector.       (line 128)
+* fl_add_glcanvas():                     OpenGL Canvas.       (line  11)
+* fl_add_input():                        Input Fields.        (line   9)
+* fl_add_input() <1>:                    Adding Input Objects.
+                                                              (line   6)
+* fl_add_io_callback():                  Handling Other Input Sources.
+                                                              (line  12)
+* fl_add_labelbutton():                  Adding Button Objects.
+                                                              (line   6)
+* fl_add_labelframe():                   Adding LabelFrame Objects.
+                                                              (line   6)
+* fl_add_lightbutton():                  Adding Button Objects.
+                                                              (line   6)
+* fl_add_menu():                         Adding Menu Objects. (line   6)
+* fl_add_nmenu():                        Adding Nmenu Objects.
+                                                              (line   6)
+* fl_add_nmenu_items():                  Adding Nmenu Objects.
+                                                              (line  30)
+* fl_add_nmenu_items2():                 Other Nmenu Routines.
+                                                              (line  58)
+* fl_add_object():                       Adding and Removing Objects.
+                                                              (line  31)
+* fl_add_object() <1>:                   Creating Forms.      (line  78)
+* fl_add_pixmap():                       Adding Pixmap Objects.
+                                                              (line   6)
+* fl_add_pixmapbutton():                 Adding Button Objects.
+                                                              (line   6)
+* fl_add_positioner():                   Adding Positioner Objects.
+                                                              (line   6)
+* fl_add_round3dbutton():                Adding Button Objects.
+                                                              (line   6)
+* fl_add_roundbutton():                  Adding Button Objects.
+                                                              (line   6)
+* fl_add_scrollbar():                    Adding Scrollbar Objects.
+                                                              (line   6)
+* fl_add_scrollbutton():                 Adding Button Objects.
+                                                              (line   6)
+* fl_add_select():                       Adding Select Objects.
+                                                              (line   6)
+* fl_add_select_items():                 Adding Select Objects.
+                                                              (line  28)
+* fl_add_signal_callback():              Signals.             (line  17)
+* fl_add_slider():                       Sliders.             (line   7)
+* fl_add_slider() <1>:                   Adding Slider Objects.
+                                                              (line   6)
+* fl_add_spinner():                      Adding Spinner Objects.
+                                                              (line   6)
+* fl_add_symbol():                       Symbols.             (line  89)
+* fl_add_tabfolder():                    Adding Folder Objects.
+                                                              (line   6)
+* fl_add_text():                         Texts.               (line   8)
+* fl_add_text() <1>:                     Adding Text Objects. (line   6)
+* fl_add_thumbwheel():                   Adding Thumbwheel Objects.
+                                                              (line   6)
+* fl_add_timeout():                      Periodic Events and Non-blocking Interaction.
+                                                              (line  48)
+* fl_add_timeout() <1>:                  Idle Callbacks and Timeouts.
+                                                              (line  37)
+* fl_add_timer():                        Adding Timer Objects.
+                                                              (line   6)
+* fl_add_valslider():                    ValSliders.          (line  10)
+* fl_add_valslider() <1>:                Adding Slider Objects.
+                                                              (line   9)
+* fl_add_xyplot():                       Adding XYPlot Objects.
+                                                              (line   6)
+* fl_add_xyplot_overlay():               Other XYPlot Routines.
+                                                              (line 157)
+* fl_add_xyplot_overlay_file():          Other XYPlot Routines.
+                                                              (line 166)
+* fl_add_xyplot_text():                  Other XYPlot Routines.
+                                                              (line 223)
+* fl_adjust_form_size():                 Initialization.      (line 396)
+* fl_app_signal_direct():                Signals.             (line  64)
+* fl_arc():                              Drawing Functions.   (line  91)
+* fl_arcf():                             Drawing Functions.   (line  91)
+* fl_bgn_form():                         Starting and Ending a Form Definition.
+                                                              (line   7)
+* fl_bgn_form() <1>:                     Creating Forms.      (line   6)
+* fl_bgn_group():                        Grouping Objects.    (line   7)
+* fl_bgn_group() <1>:                    Creating Forms.      (line  40)
+* fl_bk_color():                         Color Handling.      (line  21)
+* fl_calloc():                           The Routine fl_add_NEW().
+                                                              (line  35)
+* fl_call_object_callback():             Using Callback Functions.
+                                                              (line  58)
+* fl_call_object_callback() <1>:         Object Attributes.   (line 222)
+* fl_canvas_yield_to_shortcut():         Other Canvas Routines.
+                                                              (line  67)
+* fl_check_command():                    Command Log.         (line  51)
+* fl_check_forms():                      Periodic Events and Non-blocking Interaction.
+                                                              (line  80)
+* fl_check_forms() <1>:                  Doing Interaction.   (line 236)
+* fl_check_only_forms():                 Doing Interaction.   (line 243)
+* fl_circ():                             Drawing Functions.   (line  83)
+* fl_circbound():                        Drawing Functions.   (line  83)
+* fl_circf():                            Drawing Functions.   (line  83)
+* fl_clear_browser():                    Other Browser Routines.
+                                                              (line   9)
+* fl_clear_canvas():                     Other Canvas Routines.
+                                                              (line  70)
+* fl_clear_chart():                      Other Chart Routines.
+                                                              (line   7)
+* fl_clear_choice():                     Other Choice Routines.
+                                                              (line  31)
+* fl_clear_command_log():                Command Log.         (line  82)
+* fl_clear_menu():                       Other Menu Routines. (line  99)
+* fl_clear_nmenu():                      Other Nmenu Routines.
+                                                              (line  80)
+* fl_clear_select():                     Other Select Routines.
+                                                              (line  79)
+* fl_clear_xyplot():                     Other XYPlot Routines.
+                                                              (line 287)
+* fl_color():                            Color Handling.      (line  18)
+* fl_create_animated_cursor():           Cursors.             (line  52)
+* fl_create_bitmap_cursor():             Cursors.             (line  40)
+* fl_create_colormap():                  Other Canvas Routines.
+                                                              (line  50)
+* fl_create_from_bitmapdata():           Other Bitmap Routines.
+                                                              (line  16)
+* fl_create_from_pixmapdata():           Pixmap Remarks.      (line  21)
+* fl_create_generic_button():            Part IV New Buttons. (line  20)
+* fl_current_event():                    Object Attributes.   (line 241)
+* fl_current_pup():                      Creating XPopups.    (line 205)
+* fl_dashedlinestyle():                  Drawing Functions.   (line 176)
+* fl_deactivate_all_forms():             Dealing With Multiple Windows.
+                                                              (line  44)
+* fl_deactivate_all_forms() <1>:         Doing Interaction.   (line 255)
+* fl_deactivate_form():                  Dealing With Multiple Windows.
+                                                              (line  17)
+* fl_deactivate_form() <1>:              Doing Interaction.   (line 251)
+* fl_deactivate_object():                Deactivating and Triggering Objects.
+                                                              (line   9)
+* fl_deactivate_object() <1>:            Doing Interaction.   (line 277)
+* fl_default_window():                   General Remarks.     (line  39)
+* fl_defpup():                           Creating XPopups.    (line   6)
+* fl_delete_browser_line():              Other Browser Routines.
+                                                              (line  62)
+* fl_delete_choice():                    Other Choice Routines.
+                                                              (line  27)
+* fl_delete_folder():                    Other Folder Routines.
+                                                              (line  72)
+* fl_delete_folder_byname():             Other Folder Routines.
+                                                              (line  72)
+* fl_delete_folder_byname_f():           Other Folder Routines.
+                                                              (line  72)
+* fl_delete_folder_bynumber():           Other Folder Routines.
+                                                              (line  72)
+* fl_delete_formbrowser():               Other FormBrowser Routines.
+                                                              (line  32)
+* fl_delete_formbrowser_bynumber():      Other FormBrowser Routines.
+                                                              (line  32)
+* fl_delete_menu_item():                 Other Menu Routines. (line  51)
+* fl_delete_nmenu_item():                Other Nmenu Routines.
+                                                              (line  33)
+* fl_delete_object():                    Adding and Removing Objects.
+                                                              (line  19)
+* fl_delete_object() <1>:                Creating Forms.      (line  74)
+* fl_delete_select_item():               Other Select Routines.
+                                                              (line  47)
+* fl_delete_symbol():                    Symbols.             (line 120)
+* fl_delete_xyplot_overlay():            Other XYPlot Routines.
+                                                              (line 218)
+* fl_delete_xyplot_text():               Other XYPlot Routines.
+                                                              (line 235)
+* fl_deselect_browser():                 Other Browser Routines.
+                                                              (line 110)
+* fl_deselect_browser_line():            Other Browser Routines.
+                                                              (line 110)
+* fl_diagline():                         Drawing Functions.   (line 130)
+* fl_disable_fselector_cache():          File Selector.       (line  63)
+* fl_dopup():                            Creating XPopups.    (line 144)
+* fl_do_forms():                         Simple Interaction.  (line   9)
+* fl_do_forms() <1>:                     Doing Interaction.   (line 228)
+* fl_do_only_forms():                    Doing Interaction.   (line 243)
+* fl_drawmode():                         Drawing Functions.   (line 201)
+* fl_draw_box():                         Drawing Functions.   (line 228)
+* fl_draw_frame():                       Drawing Functions.   (line 239)
+* fl_draw_object_label():                Drawing Functions.   (line 293)
+* fl_draw_object_label_outside():        Drawing Functions.   (line 293)
+* fl_draw_symbol():                      Symbols.             (line  80)
+* fl_draw_text():                        Drawing Functions.   (line 245)
+* fl_draw_text_beside():                 Drawing Functions.   (line 245)
+* fl_draw_text_cursor():                 Drawing Functions.   (line 269)
+* fl_end_all_command():                  Command Log.         (line  46)
+* fl_end_command():                      Command Log.         (line  38)
+* fl_end_form():                         Starting and Ending a Form Definition.
+                                                              (line  17)
+* fl_end_form();:                        Creating Forms.      (line  35)
+* fl_end_group():                        Grouping Objects.    (line   9)
+* fl_end_group() <1>:                    Creating Forms.      (line  46)
+* fl_enumerate_fonts():                  Label Attributes and Fonts.
+                                                              (line 119)
+* fl_exe_command():                      Command Log.         (line  11)
+* fl_find_formbrowser_form_number():     Other FormBrowser Routines.
+                                                              (line  64)
+* fl_finish():                           Initialization.      (line 445)
+* fl_fit_object_label():                 Initialization.      (line 417)
+* fl_flip_yorigin():                     Initialization.      (line 262)
+* FL_FormDisplay():                      General Remarks.     (line  74)
+* fl_form_is_activated():                Doing Interaction.   (line 259)
+* fl_form_is_iconified():                Doing Interaction.   (line 185)
+* fl_form_is_visible():                  Displaying a Form.   (line 315)
+* fl_form_is_visible() <1>:              Doing Interaction.   (line 222)
+* fl_for_all_objects():                  Displaying a Form.   (line 280)
+* fl_free():                             The Routine fl_add_NEW().
+                                                              (line  35)
+* fl_freepup():                          Creating XPopups.    (line 212)
+* fl_freeze_all_forms():                 Object Attributes.   (line 160)
+* fl_freeze_form():                      Changing Many Attributes.
+                                                              (line  19)
+* fl_freeze_form() <1>:                  Object Attributes.   (line 152)
+* fl_free_colors():                      Color.               (line 130)
+* fl_free_colors() <1>:                  Color Handling.      (line  33)
+* fl_free_dirlist():                     File Selector.       (line 247)
+* fl_free_form():                        Freeing Objects.     (line  13)
+* fl_free_form() <1>:                    Creating Forms.      (line  91)
+* fl_free_matrix():                      Memory Allocation.   (line  35)
+* fl_free_object():                      Freeing Objects.     (line   7)
+* fl_free_object() <1>:                  Creating Forms.      (line  82)
+* fl_free_pixels():                      Color Handling.      (line  41)
+* fl_free_pixmap():                      Pixmap Remarks.      (line  34)
+* fl_free_pixmapbutton_pixmap():         Other Button Routines.
+                                                              (line 103)
+* fl_free_pixmap_focus_pixmap():         Other Button Routines.
+                                                              (line 141)
+* fl_free_pixmap_pixmap():               Other Pixmap Routines.
+                                                              (line  19)
+* fl_getmcolor():                        Color.               (line 115)
+* fl_getmcolor() <1>:                    Color Handling.      (line  46)
+* fl_getpup_items():                     Other XPopup Routines.
+                                                              (line  58)
+* fl_getpup_mode():                      Other XPopup Routines.
+                                                              (line  18)
+* fl_getpup_text():                      Other XPopup Routines.
+                                                              (line  24)
+* fl_gettime():                          Misc. Functions.     (line  23)
+* fl_get_active_folder():                Folder Interaction.  (line  39)
+* fl_get_active_folder_name():           Folder Interaction.  (line  39)
+* fl_get_active_folder_number():         Folder Interaction.  (line  39)
+* fl_get_align_xy():                     Drawing Functions.   (line 281)
+* fl_get_app_mainform():                 Doing Interaction.   (line 115)
+* fl_get_app_resources():                Current Support.     (line  29)
+* fl_get_border_width():                 Initialization.      (line 227)
+* fl_get_browser():                      Other Browser Routines.
+                                                              (line 138)
+* fl_get_browser_dimension():            Browser Attributes.  (line 177)
+* fl_get_browser_line():                 Other Browser Routines.
+                                                              (line  95)
+* fl_get_browser_line_yoffset():         Other Browser Routines.
+                                                              (line 191)
+* fl_get_browser_maxline():              Other Browser Routines.
+                                                              (line 119)
+* fl_get_browser_rel_xoffset():          Other Browser Routines.
+                                                              (line 184)
+* fl_get_browser_rel_yoffset():          Other Browser Routines.
+                                                              (line 184)
+* fl_get_browser_screenlines():          Other Browser Routines.
+                                                              (line 131)
+* fl_get_browser_scrollbar_repeat():     Browser Attributes.  (line 185)
+* fl_get_browser_topline():              Other Browser Routines.
+                                                              (line 146)
+* fl_get_browser_xoffset():              Other Browser Routines.
+                                                              (line 184)
+* fl_get_browser_yoffset():              Other Browser Routines.
+                                                              (line 184)
+* fl_get_button():                       Buttons.             (line  71)
+* fl_get_button() <1>:                   Other Button Routines.
+                                                              (line  19)
+* fl_get_button_mouse_buttons():         Other Button Routines.
+                                                              (line  45)
+* fl_get_button_numb():                  Other Button Routines.
+                                                              (line  24)
+* fl_get_canvas_colormap():              Other Canvas Routines.
+                                                              (line  17)
+* fl_get_canvas_depth():                 Other Canvas Routines.
+                                                              (line  17)
+* fl_get_canvas_id():                    Canvas Interaction.  (line  76)
+* fl_get_chart_bounds():                 Other Chart Routines.
+                                                              (line  51)
+* fl_get_char_height():                  Getting the Size.    (line  15)
+* fl_get_char_width():                   Getting the Size.    (line  15)
+* fl_get_choice():                       Other Choice Routines.
+                                                              (line  40)
+* fl_get_choice_item_mode():             Other Choice Routines.
+                                                              (line  62)
+* fl_get_choice_item_text():             Other Choice Routines.
+                                                              (line  51)
+* fl_get_choice_maxitems():              Other Choice Routines.
+                                                              (line  54)
+* fl_get_choice_text():                  Other Choice Routines.
+                                                              (line  46)
+* fl_get_clipping():                     Clipping.            (line  28)
+* fl_get_clock():                        Other Clock Routines.
+                                                              (line   7)
+* fl_get_cmdline_args():                 Initialization.      (line 102)
+* fl_get_colormap():                     Global Variables and Macros.
+                                                              (line  69)
+* fl_get_command_log_fdstruct():         Command Log.         (line  96)
+* fl_get_coordunit():                    Initialization.      (line 194)
+* fl_get_counter_bounds():               Other Counter Routines.
+                                                              (line  26)
+* fl_get_counter_min_repeat():           Other Counter Routines.
+                                                              (line  66)
+* fl_get_counter_precision():            Other Counter Routines.
+                                                              (line  34)
+* fl_get_counter_repeat():               Other Counter Routines.
+                                                              (line  66)
+* fl_get_counter_speedjump():            Other Counter Routines.
+                                                              (line  85)
+* fl_get_counter_step():                 Other Counter Routines.
+                                                              (line  26)
+* fl_get_counter_value():                Other Counter Routines.
+                                                              (line  23)
+* fl_get_decoration_sizes():             Doing Interaction.   (line 176)
+* fl_get_dial_angles():                  Other Dial Routines. (line  25)
+* fl_get_dial_bounds():                  Other Dial Routines. (line  12)
+* fl_get_dial_direction():               Other Dial Routines. (line  47)
+* fl_get_dial_step():                    Other Dial Routines. (line  39)
+* fl_get_dial_value():                   Other Dial Routines. (line  12)
+* fl_get_directory():                    File Selector.       (line 113)
+* fl_get_dirlist():                      File Selector.       (line 204)
+* fl_get_display():                      General Remarks.     (line  74)
+* fl_get_dpi():                          Global Variables and Macros.
+                                                              (line  58)
+* fl_get_drawmode(():                    Drawing Functions.   (line 221)
+* fl_get_filename():                     File Selector.       (line 113)
+* fl_get_focus_object():                 Input Fields.        (line  41)
+* fl_get_focus_object() <1>:             Object Attributes.   (line 212)
+* fl_get_folder():                       Folder Interaction.  (line  53)
+* fl_get_folder_area():                  Other Folder Routines.
+                                                              (line 100)
+* fl_get_folder_name():                  Folder Interaction.  (line  53)
+* fl_get_folder_number():                Folder Interaction.  (line  53)
+* fl_get_fontstruct():                   Font Handling.       (line   8)
+* fl_get_font_name():                    Label Attributes and Fonts.
+                                                              (line 106)
+* fl_get_formbrowser_area():             Other FormBrowser Routines.
+                                                              (line 110)
+* fl_get_formbrowser_form():             Other FormBrowser Routines.
+                                                              (line  70)
+* fl_get_formbrowser_numforms():         Other FormBrowser Routines.
+                                                              (line  20)
+* fl_get_formbrowser_topform():          Other FormBrowser Routines.
+                                                              (line  98)
+* fl_get_formbrowser_xoffset():          Other FormBrowser Routines.
+                                                              (line 127)
+* fl_get_formbrowser_yoffset():          Other FormBrowser Routines.
+                                                              (line 127)
+* fl_get_form_background_color():        Creating Forms.      (line  26)
+* fl_get_form_mouse():                   Mouse Handling.      (line  11)
+* fl_get_form_vclass():                  General Remarks.     (line  53)
+* fl_get_fselector_fdstruct():           File Selector.       (line 151)
+* fl_get_fselector_form():               File Selector.       (line 145)
+* fl_get_glcanvas_attributes():          OpenGL Canvas.       (line  36)
+* fl_get_glcanvas_context():             OpenGL Canvas.       (line  40)
+* fl_get_glcanvas_defaults():            OpenGL Canvas.       (line  26)
+* fl_get_glcanvas_xvisualinfo():         OpenGL Canvas.       (line  61)
+* fl_get_global_clipping():              Clipping.            (line  43)
+* fl_get_icm_color():                    Color.               (line  87)
+* fl_get_icm_color() <1>:                Initialization.      (line 436)
+* fl_get_input():                        Input Fields.        (line  54)
+* fl_get_input() <1>:                    Other Input Routines.
+                                                              (line  26)
+* fl_get_input_color():                  Input Attributes.    (line  17)
+* fl_get_input_cursorpos():              Other Input Routines.
+                                                              (line  65)
+* fl_get_input_editkeymap():             Input Attributes.    (line  85)
+* fl_get_input_format():                 Input Interaction.   (line 184)
+* fl_get_input_numberoflines():          Other Input Routines.
+                                                              (line 124)
+* fl_get_input_screenlines():            Other Input Routines.
+                                                              (line 130)
+* fl_get_input_scrollbarsize():          Input Attributes.    (line  28)
+* fl_get_input_selected_range():         Other Input Routines.
+                                                              (line  50)
+* fl_get_input_topline():                Other Input Routines.
+                                                              (line 127)
+* fl_get_input_xoffset():                Other Input Routines.
+                                                              (line 117)
+* fl_get_label_char_at_mouse():          Object Attributes.   (line 253)
+* fl_get_linestyle(():                   Drawing Functions.   (line 221)
+* fl_get_linewidth():                    Drawing Functions.   (line 221)
+* fl_get_matrix():                       Creating Images.     (line  35)
+* fl_get_menu():                         Other Menu Routines. (line 102)
+* fl_get_menu_item_mode():               Other Menu Routines. (line 160)
+* fl_get_menu_item_text():               Other Menu Routines. (line 118)
+* fl_get_menu_maxitems():                Other Menu Routines. (line 126)
+* fl_get_menu_popup():                   Menu Attributes.     (line  32)
+* fl_get_menu_text():                    Other Menu Routines. (line 123)
+* fl_get_mouse():                        Dealing With Multiple Windows.
+                                                              (line 158)
+* fl_get_mouse() <1>:                    Mouse Handling.      (line  22)
+* fl_get_nmenu_item():                   Other Nmenu Routines.
+                                                              (line   6)
+* fl_get_nmenu_item_by_label():          Other Nmenu Routines.
+                                                              (line  15)
+* fl_get_nmenu_item_by_text():           Other Nmenu Routines.
+                                                              (line  15)
+* fl_get_nmenu_item_by_value():          Other Nmenu Routines.
+                                                              (line  15)
+* fl_get_nmenu_popup():                  Nmenu Attributes.    (line  27)
+* fl_get_object_bbox():                  Getting the Size.    (line   9)
+* fl_get_object_bbox() <1>:              Object Attributes.   (line  75)
+* fl_get_object_boxtype():               Object Attributes.   (line  30)
+* fl_get_object_bw():                    Bounding Boxes.      (line  26)
+* fl_get_object_bw() <1>:                Object Attributes.   (line  36)
+* fl_get_object_color():                 Color.               (line  29)
+* fl_get_object_color() <1>:             Object Attributes.   (line  21)
+* fl_get_object_component():             Object Attributes.   (line  86)
+* fl_get_object_dblclick():              Object Attributes.   (line 182)
+* fl_get_object_geometry():              Object Attributes.   (line  60)
+* fl_get_object_gravity():               Displaying a Form.   (line 274)
+* fl_get_object_gravity() <1>:           Object Attributes.   (line 140)
+* fl_get_object_label():                 Label Attributes and Fonts.
+                                                              (line 201)
+* fl_get_object_label() <1>:             Object Attributes.   (line 110)
+* fl_get_object_lalign():                Object Attributes.   (line 110)
+* fl_get_object_lcolor():                Object Attributes.   (line 110)
+* fl_get_object_lsize():                 Object Attributes.   (line 110)
+* fl_get_object_lstyle():                Object Attributes.   (line 110)
+* fl_get_object_objclass():              Object Attributes.   (line  13)
+* fl_get_object_position():              Object Attributes.   (line  42)
+* fl_get_object_resize():                Displaying a Form.   (line 274)
+* fl_get_object_resize() <1>:            Object Attributes.   (line 140)
+* fl_get_object_return():                Simple Interaction.  (line  89)
+* fl_get_object_return_state():          Simple Interaction.  (line 150)
+* fl_get_object_return_state() <1>:      Browser Attributes.  (line 153)
+* fl_get_object_size():                  Object Attributes.   (line  53)
+* fl_get_object_type():                  Object Attributes.   (line  13)
+* fl_get_pattern():                      File Selector.       (line 113)
+* fl_get_pixel():                        Color Handling.      (line  11)
+* fl_get_pixmapbutton_pixmap():          Other Button Routines.
+                                                              (line 109)
+* fl_get_pixmap_pixmap():                Other Pixmap Routines.
+                                                              (line  26)
+* fl_get_positioner_mouse_buttons():     Positioner Interaction.
+                                                              (line  43)
+* fl_get_positioner_numb():              Positioner Interaction.
+                                                              (line  51)
+* fl_get_positioner_xbounds():           Other Positioner Routines.
+                                                              (line  74)
+* fl_get_positioner_xstep():             Other Positioner Routines.
+                                                              (line  87)
+* fl_get_positioner_xvalue():            Other Positioner Routines.
+                                                              (line  74)
+* fl_get_positioner_ybounds():           Other Positioner Routines.
+                                                              (line  74)
+* fl_get_positioner_ystep():             Other Positioner Routines.
+                                                              (line  87)
+* fl_get_positioner_yvalue():            Other Positioner Routines.
+                                                              (line  74)
+* fl_get_real_object_window():           Part IV Events.      (line  52)
+* fl_get_resource():                     Resources Example.   (line  40)
+* fl_get_scrollbar_bounds():             Other Scrollbar Routines.
+                                                              (line  22)
+* fl_get_scrollbar_increment():          Other Scrollbar Routines.
+                                                              (line  38)
+* fl_get_scrollbar_repeat():             Other Scrollbar Routines.
+                                                              (line  41)
+* fl_get_scrollbar_size():               Scrollbar Attributes.
+                                                              (line  24)
+* fl_get_scrollbar_value():              Other Scrollbar Routines.
+                                                              (line  22)
+* fl_get_select_item():                  Other Select Routines.
+                                                              (line   6)
+* fl_get_select_item_by_label():         Other Select Routines.
+                                                              (line  14)
+* fl_get_select_item_by_label_f():       Other Select Routines.
+                                                              (line  14)
+* fl_get_select_item_by_text():          Other Select Routines.
+                                                              (line  14)
+* fl_get_select_item_by_text_f():        Other Select Routines.
+                                                              (line  14)
+* fl_get_select_item_by_value():         Other Select Routines.
+                                                              (line  14)
+* fl_get_select_popup():                 Select Attributes.   (line  44)
+* fl_get_select_text_align():            Select Attributes.   (line  17)
+* fl_get_select_text_color():            Select Attributes.   (line  10)
+* fl_get_select_text_font():             Select Attributes.   (line  26)
+* fl_get_slider_bounds():                Other Slider Routines.
+                                                              (line  21)
+* fl_get_slider_mouse_buttons():         Other Slider Routines.
+                                                              (line  32)
+* fl_get_slider_size():                  Slider Attributes.   (line  22)
+* fl_get_slider_value():                 Sliders.             (line  22)
+* fl_get_slider_value() <1>:             Other Slider Routines.
+                                                              (line  21)
+* fl_get_spinner_bounds():               Other Spinner Routines.
+                                                              (line  15)
+* fl_get_spinner_down_button():          Spinner Attributes.  (line  19)
+* fl_get_spinner_input():                Spinner Attributes.  (line  19)
+* fl_get_spinner_precision():            Other Spinner Routines.
+                                                              (line  34)
+* fl_get_spinner_step():                 Other Spinner Routines.
+                                                              (line  27)
+* fl_get_spinner_up_button():            Spinner Attributes.  (line  19)
+* fl_get_spinner_value():                Other Spinner Routines.
+                                                              (line   6)
+* fl_get_string_dimension():             Getting the Size.    (line  46)
+* fl_get_string_height():                Getting the Size.    (line  27)
+* fl_get_string_width():                 Getting the Size.    (line  27)
+* fl_get_tabfolder_folder_byname():      Other Folder Routines.
+                                                              (line  32)
+* fl_get_tabfolder_folder_byname_f():    Other Folder Routines.
+                                                              (line  32)
+* fl_get_tabfolder_folder_bynumber():    Other Folder Routines.
+                                                              (line  32)
+* fl_get_tabfolder_numfolders():         Other Folder Routines.
+                                                              (line  69)
+* fl_get_tabfolder_offset():             Other Folder Routines.
+                                                              (line  50)
+* fl_get_text_clipping(:                 Clipping.            (line  49)
+* fl_get_thumbwheel_bounds():            Other Thumbwheel Routines.
+                                                              (line  13)
+* fl_get_thumbwheel_step():              Other Thumbwheel Routines.
+                                                              (line  30)
+* fl_get_thumbwheel_value():             Other Thumbwheel Routines.
+                                                              (line  13)
+* fl_get_timer():                        Other Timer Routines.
+                                                              (line  11)
+* fl_get_vclass():                       General Remarks.     (line  53)
+* fl_get_visual():                       Global Variables and Macros.
+                                                              (line  64)
+* fl_get_visual_depth:                   Misc. Functions.     (line  39)
+* fl_get_wingeometry():                  Dealing With Multiple Windows.
+                                                              (line 150)
+* fl_get_wingeometry() <1>:              Windowing Support.   (line 149)
+* fl_get_winorigin():                    Dealing With Multiple Windows.
+                                                              (line 150)
+* fl_get_winorigin() <1>:                Windowing Support.   (line 149)
+* fl_get_winsize():                      Dealing With Multiple Windows.
+                                                              (line 150)
+* fl_get_winsize() <1>:                  Windowing Support.   (line 149)
+* fl_get_win_mouse():                    Dealing With Multiple Windows.
+                                                              (line 165)
+* fl_get_win_mouse() <1>:                Mouse Handling.      (line  11)
+* fl_get_xyplot():                       XYPlot Interaction.  (line  40)
+* fl_get_xyplot_data():                  XYPlot Interaction.  (line  79)
+* fl_get_xyplot_data_pointer():          Other XYPlot Routines.
+                                                              (line 191)
+* fl_get_xyplot_data_size():             XYPlot Interaction.  (line  79)
+* fl_get_xyplot_mouse_buttons():         Other XYPlot Routines.
+                                                              (line 336)
+* fl_get_xyplot_numdata():               Other XYPlot Routines.
+                                                              (line 205)
+* fl_get_xyplot_overlay_data():          Other XYPlot Routines.
+                                                              (line 179)
+* fl_get_xyplot_screen_area():           Other XYPlot Routines.
+                                                              (line 316)
+* fl_get_xyplot_world_area():            Other XYPlot Routines.
+                                                              (line 316)
+* fl_get_xyplot_xbounds():               Other XYPlot Routines.
+                                                              (line 147)
+* fl_get_xyplot_xmapping():              Other XYPlot Routines.
+                                                              (line 296)
+* fl_get_xyplot_ybounds():               Other XYPlot Routines.
+                                                              (line 147)
+* fl_get_xyplot_ymapping():              Other XYPlot Routines.
+                                                              (line 296)
+* fl_hidepup():                          XPopup Attributes.   (line  70)
+* fl_hide_alert():                       Messages and Questions.
+                                                              (line  52)
+* fl_hide_choice():                      Messages and Questions.
+                                                              (line 130)
+* fl_hide_command_log():                 Command Log.         (line  69)
+* fl_hide_form():                        Displaying a Form.   (line 312)
+* fl_hide_form() <1>:                    Doing Interaction.   (line 217)
+* fl_hide_fselector():                   File Selector.       (line  36)
+* fl_hide_input():                       Messages and Questions.
+                                                              (line 157)
+* fl_hide_message():                     Messages and Questions.
+                                                              (line  33)
+* fl_hide_object():                      Hiding and Showing.  (line   7)
+* fl_hide_object() <1>:                  Object Attributes.   (line 186)
+* fl_hide_oneliner():                    Messages and Questions.
+                                                              (line  37)
+* fl_hide_question():                    Messages and Questions.
+                                                              (line  92)
+* fl_iconify():                          Windowing Support.   (line 172)
+* fl_initialize():                       Initialization.      (line   6)
+* fl_initial_wingeometry():              Windowing Support.   (line  97)
+* fl_initial_winsize():                  Windowing Support.   (line  56)
+* fl_initial_winstate():                 Windowing Support.   (line  68)
+* fl_input_end_return_handling():        Input Interaction.   (line 136)
+* fl_insert_browser_line():              Other Browser Routines.
+                                                              (line  45)
+* fl_insert_browser_line_f():            Other Browser Routines.
+                                                              (line  45)
+* fl_insert_chart_value():               Other Chart Routines.
+                                                              (line  29)
+* fl_insert_formbrowser():               Other FormBrowser Routines.
+                                                              (line  57)
+* fl_insert_nmenu_items():               Other Nmenu Routines.
+                                                              (line  44)
+* fl_insert_nmenu_items2():              Other Nmenu Routines.
+                                                              (line  58)
+* fl_insert_select_items():              Other Select Routines.
+                                                              (line  69)
+* fl_insert_xyplot_data():               Other XYPlot Routines.
+                                                              (line 209)
+* fl_interpolate():                      XYPlot Remarks.      (line   7)
+* fl_invalidate_fselector_cache():       File Selector.       (line  59)
+* fl_isselected_browser_line():          Other Browser Routines.
+                                                              (line 116)
+* fl_is_center_lalign():                 Label Attributes and Fonts.
+                                                              (line 171)
+* fl_is_clipped():                       Clipping.            (line  21)
+* fl_is_global_clipped():                Clipping.            (line  43)
+* fl_is_inside_lalign():                 Label Attributes and Fonts.
+                                                              (line 171)
+* fl_is_outside_lalign():                Label Attributes and Fonts.
+                                                              (line 171)
+* fl_is_text_clipped(:                   Clipping.            (line  49)
+* fl_last_event():                       Dealing With Multiple Windows.
+                                                              (line 142)
+* fl_last_event() <1>:                   Object Attributes.   (line 235)
+* fl_library_version():                  Version Information. (line  18)
+* fl_line():                             Drawing Functions.   (line 125)
+* fl_lines():                            Drawing Functions.   (line 134)
+* fl_linestyle():                        Drawing Functions.   (line 151)
+* fl_linewidth():                        Drawing Functions.   (line 151)
+* fl_load_browser():                     Other Browser Routines.
+                                                              (line 100)
+* fl_lower_form():                       Doing Interaction.   (line 157)
+* fl_make_matrix():                      Memory Allocation.   (line   7)
+* fl_make_object():                      Part IV The Type FL_OBJECT.
+                                                              (line 328)
+* fl_malloc():                           The Routine fl_add_NEW().
+                                                              (line  35)
+* fl_mapcolor():                         Color.               (line  99)
+* fl_mapcolor() <1>:                     Color Handling.      (line  46)
+* fl_mapcolorname():                     Color.               (line 111)
+* fl_mapcolorname() <1>:                 Color Handling.      (line  46)
+* fl_mode_capable():                     Misc. Functions.     (line  29)
+* fl_mouse_button():                     Dealing With Multiple Windows.
+                                                              (line 121)
+* fl_move_object():                      Object Attributes.   (line  48)
+* fl_msleep():                           Misc. Functions.     (line  42)
+* fl_newpup():                           Creating XPopups.    (line   6)
+* fl_noborder():                         Windowing Support.   (line 128)
+* fl_now():                              Misc. Functions.     (line  19)
+* fl_object_is_active():                 Deactivating and Triggering Objects.
+                                                              (line  15)
+* fl_object_is_active() <1>:             Doing Interaction.   (line 283)
+* fl_object_is_automatic():              Object Attributes.   (line 173)
+* fl_object_is_visible():                Hiding and Showing.  (line  19)
+* fl_object_is_visible() <1>:            Object Attributes.   (line 193)
+* fl_object_ps_dump():                   Object Attributes.   (line 265)
+* FL_ObjWin():                           Canvas Interaction.  (line  78)
+* fl_oval():                             Drawing Functions.   (line  74)
+* fl_ovalarc(:                           Drawing Functions.   (line 115)
+* fl_ovalbound():                        Drawing Functions.   (line  62)
+* fl_ovalf():                            Drawing Functions.   (line  62)
+* fl_ovall():                            Drawing Functions.   (line  62)
+* fl_pclose():                           Command Log.         (line  60)
+* fl_pieslice():                         Drawing Functions.   (line 104)
+* fl_point():                            Drawing Functions.   (line 138)
+* fl_points():                           Drawing Functions.   (line 138)
+* fl_polybound():                        Drawing Functions.   (line  43)
+* fl_polyf():                            Drawing Functions.   (line  43)
+* fl_polyl():                            Drawing Functions.   (line  43)
+* fl_popen():                            Command Log.         (line  60)
+* fl_popup_add():                        Adding Popups.       (line  13)
+* fl_popup_add_entries():                Adding Popups.       (line  28)
+* fl_popup_add_items():                  Adding Popups.       (line 545)
+* fl_popup_create():                     Adding Popups.       (line 408)
+* fl_popup_entry_clear_state():          Other Popup Routines.
+                                                              (line  75)
+* fl_popup_entry_delete():               Adding Popups.       (line 379)
+* fl_popup_entry_get_by_label():         Other Popup Routines.
+                                                              (line 112)
+* fl_popup_entry_get_by_label_f():       Other Popup Routines.
+                                                              (line 112)
+* fl_popup_entry_get_by_position():      Other Popup Routines.
+                                                              (line 134)
+* fl_popup_entry_get_by_text():          Other Popup Routines.
+                                                              (line  96)
+* fl_popup_entry_get_by_text_f():        Other Popup Routines.
+                                                              (line  96)
+* fl_popup_entry_get_by_user_data():     Other Popup Routines.
+                                                              (line 128)
+* fl_popup_entry_get_by_value():         Other Popup Routines.
+                                                              (line 123)
+* fl_popup_entry_get_group():            Popup Attributes.    (line 127)
+* fl_popup_entry_get_state():            Other Popup Routines.
+                                                              (line  58)
+* fl_popup_entry_get_subpopup():         Popup Attributes.    (line 146)
+* fl_popup_entry_set_callback():         Other Popup Routines.
+                                                              (line  35)
+* fl_popup_entry_set_enter_callback():   Other Popup Routines.
+                                                              (line  35)
+* fl_popup_entry_set_font():             Popup Attributes.    (line  29)
+* fl_popup_entry_set_group():            Popup Attributes.    (line 133)
+* fl_popup_entry_set_leave_callback():   Other Popup Routines.
+                                                              (line  35)
+* fl_popup_entry_set_shortcut():         Popup Attributes.    (line 112)
+* fl_popup_entry_set_state():            Other Popup Routines.
+                                                              (line  58)
+* fl_popup_entry_set_subpopup():         Popup Attributes.    (line 146)
+* fl_popup_entry_set_text():             Popup Attributes.    (line 106)
+* fl_popup_entry_set_user_data():        Popup Attributes.    (line 122)
+* fl_popup_entry_set_value():            Popup Attributes.    (line 117)
+* fl_popup_get_bw():                     Popup Attributes.    (line  52)
+* fl_popup_get_color():                  Popup Attributes.    (line  75)
+* fl_popup_get_min_width():              Popup Attributes.    (line  42)
+* fl_popup_get_policy():                 Popup Interaction.   (line  79)
+* fl_popup_get_size():                   Other Popup Routines.
+                                                              (line  18)
+* fl_popup_get_title():                  Popup Attributes.    (line   6)
+* fl_popup_get_title_font():             Popup Attributes.    (line  17)
+* fl_popup_insert_items():               Adding Popups.       (line 545)
+* fl_popup_raise_clear_state():          Other Popup Routines.
+                                                              (line  75)
+* fl_popup_set_bw():                     Popup Attributes.    (line  52)
+* fl_popup_set_callback():               Other Popup Routines.
+                                                              (line  28)
+* fl_popup_set_color():                  Popup Attributes.    (line  75)
+* fl_popup_set_cursor():                 Popup Attributes.    (line  63)
+* fl_popup_set_min_width():              Popup Attributes.    (line  42)
+* fl_popup_set_policy():                 Popup Interaction.   (line  66)
+* fl_popup_set_position():               Other Popup Routines.
+                                                              (line   8)
+* fl_popup_set_title():                  Popup Attributes.    (line   6)
+* fl_popup_set_title_f():                Popup Attributes.    (line   6)
+* fl_popup_set_title_font():             Popup Attributes.    (line  17)
+* fl_popup_toggle_clear_state():         Other Popup Routines.
+                                                              (line  75)
+* fl_prepare_form_window():              Displaying a Form.   (line 173)
+* fl_prepare_form_window() <1>:          Doing Interaction.   (line 135)
+* fl_prepare_form_window_f():            Doing Interaction.   (line 135)
+* fl_print_xevent_name():                Dealing With Multiple Windows.
+                                                              (line 169)
+* fl_raise_form():                       Doing Interaction.   (line 154)
+* fl_read_bitmapfile():                  Other Bitmap Routines.
+                                                              (line  16)
+* fl_read_pixmapfile():                  Pixmap Remarks.      (line   7)
+* fl_realloc():                          The Routine fl_add_NEW().
+                                                              (line  35)
+* fl_rect():                             Drawing Functions.   (line  23)
+* fl_rectbound():                        Drawing Functions.   (line  32)
+* fl_rectf():                            Drawing Functions.   (line  23)
+* fl_redraw_form():                      Redrawing.           (line  16)
+* fl_redraw_form() <1>:                  Doing Interaction.   (line 293)
+* fl_redraw_object():                    Redrawing.           (line  13)
+* fl_redraw_object() <1>:                Doing Interaction.   (line 286)
+* fl_refresh_fselector():                File Selector.       (line 139)
+* fl_register_raw_callback():            Form Events.         (line  13)
+* fl_remove_canvas_handler():            Canvas Interaction.  (line  67)
+* fl_remove_event_callback():            Using Callback Functions.
+                                                              (line 150)
+* fl_remove_event_callback() <1>:        Doing Interaction.   (line 309)
+* fl_remove_fselector_appbutton():       File Selector.       (line 135)
+* fl_remove_io_callback():               Handling Other Input Sources.
+                                                              (line  38)
+* fl_remove_selected_xevent():           Using Callback Functions.
+                                                              (line 133)
+* fl_remove_signal_callback():           Signals.             (line  44)
+* fl_remove_timeout():                   Periodic Events and Non-blocking Interaction.
+                                                              (line  59)
+* fl_remove_timeout() <1>:               Idle Callbacks and Timeouts.
+                                                              (line  53)
+* fl_replace_browser_line():             Other Browser Routines.
+                                                              (line  66)
+* fl_replace_browser_line_f():           Other Browser Routines.
+                                                              (line  66)
+* fl_replace_chart_value():              Other Chart Routines.
+                                                              (line  38)
+* fl_replace_choice():                   Other Choice Routines.
+                                                              (line  34)
+* fl_replace_choice_f():                 Other Choice Routines.
+                                                              (line  34)
+* fl_replace_formbrowser():              Other FormBrowser Routines.
+                                                              (line  48)
+* fl_replace_menu_item():                Other Menu Routines. (line  51)
+* fl_replace_nmenu_item():               Other Nmenu Routines.
+                                                              (line  36)
+* fl_replace_nmenu_items2():             Other Nmenu Routines.
+                                                              (line  58)
+* fl_replace_select_item():              Other Select Routines.
+                                                              (line  53)
+* fl_replace_xyplot_point():             Other XYPlot Routines.
+                                                              (line 151)
+* fl_request_clipboard():                Clipboard.           (line  45)
+* fl_reset_cursor():                     Cursors.             (line  30)
+* fl_reset_focus_object():               Object Attributes.   (line 208)
+* fl_reset_positioner:                   Other Positioner Routines.
+                                                              (line  11)
+* fl_reset_winconstraints():             Windowing Support.   (line 145)
+* fl_resume_timer():                     Other Timer Routines.
+                                                              (line  24)
+* fl_ringbell():                         Misc. Functions.     (line   7)
+* fl_roundrect():                        Drawing Functions.   (line  37)
+* fl_roundrectf():                       Drawing Functions.   (line  37)
+* fl_scale_form():                       Displaying a Form.   (line 185)
+* fl_scale_form() <1>:                   Doing Interaction.   (line 162)
+* fl_select_browser_line():              Other Browser Routines.
+                                                              (line 110)
+* fl_setpup_align_bottom():              Other XPopup Routines.
+                                                              (line  44)
+* fl_setpup_bw():                        XPopup Attributes.   (line  45)
+* fl_setpup_cursor():                    XPopup Attributes.   (line  30)
+* fl_setpup_default_bw();:               XPopup Attributes.   (line  15)
+* fl_setpup_default_checkcolor():        XPopup Attributes.   (line  61)
+* fl_setpup_default_color():             XPopup Attributes.   (line  54)
+* fl_setpup_default_cursor():            XPopup Attributes.   (line  23)
+* fl_setpup_default_fontsize():          Menu Attributes.     (line  16)
+* fl_setpup_default_fontsize() <1>:      XPopup Attributes.   (line  15)
+* fl_setpup_default_fontstyle():         Menu Attributes.     (line  16)
+* fl_setpup_default_fontstyle() <1>:     XPopup Attributes.   (line  15)
+* fl_setpup_entercb():                   XPopup Interaction.  (line  63)
+* fl_setpup_entries():                   Creating XPopups.    (line 216)
+* fl_setpup_itemcb():                    XPopup Interaction.  (line  40)
+* fl_setpup_leavecb():                   XPopup Interaction.  (line  63)
+* fl_setpup_maxpups():                   XPopup Attributes.   (line  65)
+* fl_setpup_menucb():                    XPopup Interaction.  (line  40)
+* fl_setpup_mode():                      Other XPopup Routines.
+                                                              (line  10)
+* fl_setpup_position():                  Other XPopup Routines.
+                                                              (line  31)
+* fl_setpup_selection():                 Other XPopup Routines.
+                                                              (line  53)
+* fl_setpup_shadow():                    XPopup Attributes.   (line  39)
+* fl_setpup_shortcut():                  XPopup Interaction.  (line  21)
+* fl_setpup_softedge():                  XPopup Attributes.   (line  45)
+* fl_setpup_submenu():                   XPopup Interaction.  (line  78)
+* fl_setpup_title():                     XPopup Attributes.   (line   6)
+* fl_setpup_title_f():                   XPopup Attributes.   (line   6)
+* fl_set_app_mainform():                 Displaying a Form.   (line 166)
+* fl_set_app_mainform() <1>:             Doing Interaction.   (line 110)
+* fl_set_app_nomainform():               Doing Interaction.   (line 124)
+* fl_set_atclose():                      Displaying a Form.   (line 337)
+* fl_set_background():                   Color Handling.      (line  25)
+* fl_set_bitmapbutton_data():            Other Button Routines.
+                                                              (line  85)
+* fl_set_bitmapbutton_file():            Other Button Routines.
+                                                              (line  85)
+* fl_set_bitmap_data():                  Other Bitmap Routines.
+                                                              (line   6)
+* fl_set_bitmap_file():                  Other Bitmap Routines.
+                                                              (line   6)
+* fl_set_border_width():                 Bounding Boxes.      (line  48)
+* fl_set_border_width() <1>:             Initialization.      (line 216)
+* fl_set_browser_bottomline():           Other Browser Routines.
+                                                              (line 165)
+* fl_set_browser_dblclick_callback():    Other Browser Routines.
+                                                              (line 157)
+* fl_set_browser_fontsize():             Browser Attributes.  (line  13)
+* fl_set_browser_fontstyle():            Browser Attributes.  (line  16)
+* fl_set_browser_hscrollbar():           Browser Attributes.  (line 108)
+* fl_set_browser_hscroll_callback():     Browser Attributes.  (line 128)
+* fl_set_browser_rel_xoffset():          Other Browser Routines.
+                                                              (line 172)
+* fl_set_browser_rel_yoffset():          Other Browser Routines.
+                                                              (line 172)
+* fl_set_browser_scrollbarsize():        Browser Attributes.  (line 160)
+* fl_set_browser_scrollbar_repeat():     Browser Attributes.  (line 185)
+* fl_set_browser_specialkey():           Browser Attributes.  (line 101)
+* fl_set_browser_topline():              Other Browser Routines.
+                                                              (line 165)
+* fl_set_browser_vscrollbar():           Browser Attributes.  (line 108)
+* fl_set_browser_vscroll_callback():     Browser Attributes.  (line 128)
+* fl_set_browser_xoffset():              Other Browser Routines.
+                                                              (line 172)
+* fl_set_browser_yoffset():              Other Browser Routines.
+                                                              (line 172)
+* fl_set_button():                       Buttons.             (line  60)
+* fl_set_button() <1>:                   Other Button Routines.
+                                                              (line   7)
+* fl_set_button_mouse_buttons():         Other Button Routines.
+                                                              (line  38)
+* fl_set_button_shortcut():              Other Button Routines.
+                                                              (line  54)
+* fl_set_canvas_attributes():            Other Canvas Routines.
+                                                              (line   9)
+* fl_set_canvas_colormap():              Other Canvas Routines.
+                                                              (line  17)
+* fl_set_canvas_depth():                 Other Canvas Routines.
+                                                              (line  17)
+* fl_set_canvas_visual():                Other Canvas Routines.
+                                                              (line  17)
+* fl_set_chart_autosize():               Other Chart Routines.
+                                                              (line  55)
+* fl_set_chart_baseline():               Chart Attributes.    (line   9)
+* fl_set_chart_bounds():                 Other Chart Routines.
+                                                              (line  48)
+* fl_set_chart_lcolor():                 Other Chart Routines.
+                                                              (line  22)
+* fl_set_chart_lsize():                  Other Chart Routines.
+                                                              (line  22)
+* fl_set_chart_lstyle():                 Other Chart Routines.
+                                                              (line  22)
+* fl_set_chart_maxnumb():                Other Chart Routines.
+                                                              (line  59)
+* fl_set_choice():                       Other Choice Routines.
+                                                              (line  76)
+* fl_set_choices_shortcut():             Messages and Questions.
+                                                              (line 130)
+* fl_set_choice_align():                 Choice Attributes.   (line  13)
+* fl_set_choice_align_bottom():          Choice Attributes.   (line  32)
+* fl_set_choice_entries():               Other Choice Routines.
+                                                              (line  66)
+* fl_set_choice_fontsize():              Choice Attributes.   (line  16)
+* fl_set_choice_fontstyle():             Choice Attributes.   (line  19)
+* fl_set_choice_item_mode():             Other Choice Routines.
+                                                              (line  57)
+* fl_set_choice_text():                  Other Choice Routines.
+                                                              (line  76)
+* fl_set_choice_text_f():                Other Choice Routines.
+                                                              (line  76)
+* fl_set_clipping():                     Clipping.            (line   6)
+* fl_set_clock_adjustment():             Other Clock Routines.
+                                                              (line  13)
+* fl_set_clock_ampm():                   Other Clock Routines.
+                                                              (line  20)
+* fl_set_color_leak():                   Color.               (line 139)
+* fl_set_command_log_position():         Command Log.         (line  77)
+* fl_set_coordunit():                    Initialization.      (line 194)
+* fl_set_counter_bounds():               Other Counter Routines.
+                                                              (line   7)
+* fl_set_counter_filter():               Other Counter Routines.
+                                                              (line  39)
+* fl_set_counter_min_repeat():           Other Counter Routines.
+                                                              (line  62)
+* fl_set_counter_precision():            Other Counter Routines.
+                                                              (line  31)
+* fl_set_counter_repeat():               Other Counter Routines.
+                                                              (line  60)
+* fl_set_counter_speedjump():            Other Counter Routines.
+                                                              (line  78)
+* fl_set_counter_step():                 Other Counter Routines.
+                                                              (line   7)
+* fl_set_counter_value():                Other Counter Routines.
+                                                              (line   7)
+* fl_set_cursor():                       Cursors.             (line   6)
+* fl_set_cursor_color():                 Cursors.             (line  33)
+* fl_set_defaults():                     Initialization.      (line 121)
+* fl_set_default_tabfolder_corner():     Folder Remarks.      (line   9)
+* fl_set_dial_angles():                  Other Dial Routines. (line  18)
+* fl_set_dial_bounds():                  Other Dial Routines. (line   6)
+* fl_set_dial_crossover():               Other Dial Routines. (line  29)
+* fl_set_dial_direction():               Other Dial Routines. (line  43)
+* fl_set_dial_step():                    Other Dial Routines. (line  34)
+* fl_set_dial_value():                   Other Dial Routines. (line   6)
+* fl_set_directory():                    File Selector.       (line 119)
+* fl_set_dirlist_filter():               File Selector.       (line 269)
+* fl_set_dirlist_filterdir():            File Selector.       (line 275)
+* fl_set_dirlist_sort():                 File Selector.       (line 282)
+* fl_set_error_handler():                Initialization.      (line 313)
+* fl_set_error_logfp():                  Initialization.      (line 324)
+* fl_set_event_callback():               Using Callback Functions.
+                                                              (line  83)
+* fl_set_event_callback() <1>:           Doing Interaction.   (line 303)
+* fl_set_focus_object():                 Input Fields.        (line  38)
+* fl_set_focus_object() <1>:             Object Attributes.   (line 200)
+* fl_set_folder():                       Other Folder Routines.
+                                                              (line  87)
+* fl_set_folder_byname():                Other Folder Routines.
+                                                              (line  87)
+* fl_set_folder_byname_f():              Other Folder Routines.
+                                                              (line  87)
+* fl_set_folder_bynumber():              Other Folder Routines.
+                                                              (line  87)
+* fl_set_font_name():                    Label Attributes and Fonts.
+                                                              (line  77)
+* fl_set_font_name() <1>:                Initialization.      (line 339)
+* fl_set_font_name_f():                  Label Attributes and Fonts.
+                                                              (line  77)
+* fl_set_font_name_f() <1>:              Initialization.      (line 339)
+* fl_set_foreground():                   Color Handling.      (line  25)
+* fl_set_formbrowser_hscrollbar():       Other FormBrowser Routines.
+                                                              (line  75)
+* fl_set_formbrowser_scroll():           Other FormBrowser Routines.
+                                                              (line  88)
+* fl_set_formbrowser_topform():          Other FormBrowser Routines.
+                                                              (line 102)
+* fl_set_formbrowser_topform_bynumber(): Other FormBrowser Routines.
+                                                              (line 102)
+* fl_set_formbrowser_vscrollbar():       Other FormBrowser Routines.
+                                                              (line  75)
+* fl_set_formbrowser_xoffset():          Other FormBrowser Routines.
+                                                              (line 117)
+* fl_set_formbrowser_yoffset():          Other FormBrowser Routines.
+                                                              (line 117)
+* fl_set_form_atactivate():              Dealing With Multiple Windows.
+                                                              (line  32)
+* fl_set_form_atactivate() <1>:          Doing Interaction.   (line 264)
+* fl_set_form_atclose():                 Displaying a Form.   (line 346)
+* fl_set_form_atdeactivate():            Dealing With Multiple Windows.
+                                                              (line  32)
+* fl_set_form_atdeactivate() <1>:        Doing Interaction.   (line 264)
+* fl_set_form_background_color():        Creating Forms.      (line  26)
+* fl_set_form_callback():                Using Callback Functions.
+                                                              (line  63)
+* fl_set_form_callback() <1>:            Object Attributes.   (line 227)
+* fl_set_form_dblbuffer():               Initialization.      (line 300)
+* fl_set_form_geometry():                Displaying a Form.   (line 101)
+* fl_set_form_geometry() <1>:            Doing Interaction.   (line 162)
+* fl_set_form_hotobject():               Displaying a Form.   (line 121)
+* fl_set_form_hotspot():                 Displaying a Form.   (line 121)
+* fl_set_form_icon():                    Displaying a Form.   (line 303)
+* fl_set_form_icon() <1>:                Doing Interaction.   (line 202)
+* fl_set_form_maxsize():                 Doing Interaction.   (line 192)
+* fl_set_form_minsize():                 Doing Interaction.   (line 192)
+* fl_set_form_position():                Displaying a Form.   (line  97)
+* fl_set_form_position() <1>:            Doing Interaction.   (line 162)
+* fl_set_form_size():                    Displaying a Form.   (line  99)
+* fl_set_form_size() <1>:                Doing Interaction.   (line 162)
+* fl_set_form_title():                   Displaying a Form.   (line 298)
+* fl_set_form_title() <1>:               Doing Interaction.   (line 210)
+* fl_set_form_title_f():                 Displaying a Form.   (line 298)
+* fl_set_form_title_f() <1>:             Doing Interaction.   (line 210)
+* fl_set_fselector_border():             File Selector.       (line 102)
+* fl_set_fselector_callback():           File Selector.       (line  84)
+* fl_set_fselector_filetype_marker():    File Selector.       (line 184)
+* fl_set_fselector_fontsize():           File Selector.       (line  48)
+* fl_set_fselector_fontstyle():          File Selector.       (line  48)
+* fl_set_fselector_placement():          File Selector.       (line  96)
+* fl_set_fselector_title():              File Selector.       (line  56)
+* fl_set_gc_clipping():                  Clipping.            (line  57)
+* fl_set_glcanvas_attributes():          OpenGL Canvas.       (line  30)
+* fl_set_glcanvas_defaults():            OpenGL Canvas.       (line  22)
+* fl_set_glcanvas_direct():              OpenGL Canvas.       (line  46)
+* fl_set_goodies_font():                 Messages and Questions.
+                                                              (line 154)
+* fl_set_icm_color():                    Color.               (line  76)
+* fl_set_icm_color() <1>:                Color.               (line  87)
+* fl_set_icm_color() <2>:                Initialization.      (line 433)
+* fl_set_idle_callback():                Periodic Events and Non-blocking Interaction.
+                                                              (line  22)
+* fl_set_idle_callback() <1>:            Idle Callbacks and Timeouts.
+                                                              (line  10)
+* fl_set_idle_delta():                   Idle Callbacks and Timeouts.
+                                                              (line  24)
+* fl_set_input():                        Input Fields.        (line  46)
+* fl_set_input() <1>:                    Other Input Routines.
+                                                              (line   7)
+* fl_set_input_color():                  Input Fields.        (line  50)
+* fl_set_input_color() <1>:              Input Attributes.    (line  12)
+* fl_set_input_cursorpos():              Other Input Routines.
+                                                              (line  76)
+* fl_set_input_cursor_visible():         Other Input Routines.
+                                                              (line 121)
+* fl_set_input_editkeymap():             Input Attributes.    (line  72)
+* fl_set_input_f():                      Input Fields.        (line  46)
+* fl_set_input_f() <1>:                  Other Input Routines.
+                                                              (line   7)
+* fl_set_input_fieldchar():              Other Input Routines.
+                                                              (line 135)
+* fl_set_input_filter():                 Input Interaction.   (line 154)
+* fl_set_input_format():                 Input Interaction.   (line 184)
+* fl_set_input_hscrollbar():             Other Input Routines.
+                                                              (line  87)
+* fl_set_input_maxchars():               Input Interaction.   (line 145)
+* fl_set_input_mode():                   Input Interaction.   (line 222)
+* fl_set_input_scroll():                 Other Input Routines.
+                                                              (line 103)
+* fl_set_input_scrollbarsize():          Input Attributes.    (line  22)
+* fl_set_input_selected():               Other Input Routines.
+                                                              (line  37)
+* fl_set_input_selected_range():         Other Input Routines.
+                                                              (line  37)
+* fl_set_input_topline():                Other Input Routines.
+                                                              (line 108)
+* fl_set_input_vscrollbar():             Other Input Routines.
+                                                              (line  87)
+* fl_set_input_xoffset():                Other Input Routines.
+                                                              (line 111)
+* fl_set_menu():                         Other Menu Routines. (line  12)
+* fl_set_menu_entries():                 Other Menu Routines. (line  74)
+* fl_set_menu_item_callback():           Other Menu Routines. (line 165)
+* fl_set_menu_item_mode():               Other Menu Routines. (line 132)
+* fl_set_menu_item_shortcut():           Other Menu Routines. (line 175)
+* fl_set_menu_notitle():                 Menu Attributes.     (line  40)
+* fl_set_menu_popup():                   Menu Attributes.     (line  22)
+* fl_set_mouse():                        Mouse Handling.      (line  27)
+* fl_set_nmenu_hl_text_color():          Nmenu Attributes.    (line  12)
+* fl_set_nmenu_items():                  Adding Nmenu Objects.
+                                                              (line  50)
+* fl_set_nmenu_policy():                 Nmenu Interaction.   (line  55)
+* fl_set_nmenu_popup():                  Adding Nmenu Objects.
+                                                              (line 130)
+* fl_set_object_automatic():             Object Attributes.   (line 170)
+* fl_set_object_boxtype():               Bounding Boxes.      (line  10)
+* fl_set_object_boxtype() <1>:           Object Attributes.   (line  25)
+* fl_set_object_bw():                    Bounding Boxes.      (line  23)
+* fl_set_object_bw() <1>:                Object Attributes.   (line  36)
+* fl_set_object_callback():              Using Callback Functions.
+                                                              (line  17)
+* fl_set_object_callback() <1>:          Object Attributes.   (line 215)
+* fl_set_object_color():                 Color.               (line   6)
+* fl_set_object_color() <1>:             Object Attributes.   (line  19)
+* fl_set_object_dblbuffer():             Initialization.      (line 300)
+* fl_set_object_dblclick():              Object Attributes.   (line 177)
+* fl_set_object_geometry():              Object Attributes.   (line  60)
+* fl_set_object_gravity():               Displaying a Form.   (line 195)
+* fl_set_object_gravity() <1>:           Object Attributes.   (line 140)
+* fl_set_object_helper():                Tool Tips.           (line  13)
+* fl_set_object_helper() <1>:            Object Attributes.   (line 117)
+* fl_set_object_helper_f():              Tool Tips.           (line  13)
+* fl_set_object_helper_f() <1>:          Object Attributes.   (line 117)
+* fl_set_object_label():                 Label Attributes and Fonts.
+                                                              (line 191)
+* fl_set_object_label() <1>:             Object Attributes.   (line 101)
+* fl_set_object_label_f():               Label Attributes and Fonts.
+                                                              (line 191)
+* fl_set_object_label_f() <1>:           Object Attributes.   (line 101)
+* fl_set_object_lalign():                Label Attributes and Fonts.
+                                                              (line 137)
+* fl_set_object_lalign() <1>:            Object Attributes.   (line 101)
+* fl_set_object_lcolor():                Label Attributes and Fonts.
+                                                              (line   7)
+* fl_set_object_lcolor() <1>:            Object Attributes.   (line 101)
+* fl_set_object_lsize():                 Label Attributes and Fonts.
+                                                              (line  10)
+* fl_set_object_lsize() <1>:             Object Attributes.   (line 101)
+* fl_set_object_lstyle():                Label Attributes and Fonts.
+                                                              (line  29)
+* fl_set_object_lstyle() <1>:            Object Attributes.   (line 101)
+* fl_set_object_position():              Object Attributes.   (line  42)
+* fl_set_object_posthandler():           Part IV Using a Pre-emptive Handler.
+                                                              (line  26)
+* fl_set_object_posthandler() <1>:       Object Events.       (line  42)
+* fl_set_object_prehandler():            Part IV Using a Pre-emptive Handler.
+                                                              (line  26)
+* fl_set_object_prehandler() <1>:        Object Events.       (line  20)
+* fl_set_object_resize():                Displaying a Form.   (line 195)
+* fl_set_object_resize() <1>:            Object Attributes.   (line 140)
+* fl_set_object_return():                Simple Interaction.  (line  89)
+* fl_set_object_shortcut():              Shortcuts.           (line  11)
+* fl_set_object_shortcutkey():           Shortcuts.           (line  45)
+* fl_set_object_size():                  Object Attributes.   (line  53)
+* fl_set_oneliner_color():               Messages and Questions.
+                                                              (line  46)
+* fl_set_oneliner_font():                Messages and Questions.
+                                                              (line  49)
+* fl_set_pattern():                      File Selector.       (line 119)
+* fl_set_pixmapbutton_align():           Other Button Routines.
+                                                              (line 114)
+* fl_set_pixmapbutton_data():            Other Button Routines.
+                                                              (line  91)
+* fl_set_pixmapbutton_file():            Other Button Routines.
+                                                              (line  91)
+* fl_set_pixmapbutton_focus_data():      Other Button Routines.
+                                                              (line 125)
+* fl_set_pixmapbutton_focus_file():      Other Button Routines.
+                                                              (line 125)
+* fl_set_pixmapbutton_focus_outline():   Other Button Routines.
+                                                              (line 136)
+* fl_set_pixmapbutton_focus_pixmap():    Other Button Routines.
+                                                              (line 125)
+* fl_set_pixmapbutton_pixmap():          Other Button Routines.
+                                                              (line  91)
+* fl_set_pixmap_align():                 Other Pixmap Routines.
+                                                              (line  46)
+* fl_set_pixmap_colorcloseness():        Pixmap Attributes.   (line  12)
+* fl_set_pixmap_data():                  Other Pixmap Routines.
+                                                              (line  11)
+* fl_set_pixmap_file():                  Other Pixmap Routines.
+                                                              (line  11)
+* fl_set_pixmap_pixmap():                Other Pixmap Routines.
+                                                              (line  33)
+* fl_set_positioner_mouse_buttons():     Positioner Interaction.
+                                                              (line  36)
+* fl_set_positioner_validator():         Other Positioner Routines.
+                                                              (line  33)
+* fl_set_positioner_values():            Other Positioner Routines.
+                                                              (line  63)
+* fl_set_positioner_xbounds():           Other Positioner Routines.
+                                                              (line  18)
+* fl_set_positioner_xstep():             Other Positioner Routines.
+                                                              (line  81)
+* fl_set_positioner_xvalue():            Other Positioner Routines.
+                                                              (line  63)
+* fl_set_positioner_ybounds():           Other Positioner Routines.
+                                                              (line  18)
+* fl_set_positioner_ystep():             Other Positioner Routines.
+                                                              (line  81)
+* fl_set_positioner_yvalue():            Other Positioner Routines.
+                                                              (line  63)
+* fl_set_resource():                     Messages and Questions.
+                                                              (line 182)
+* fl_set_resource() <1>:                 Resources Example.   (line  55)
+* fl_set_scrollbar_bounds():             Other Scrollbar Routines.
+                                                              (line   7)
+* fl_set_scrollbar_increment():          Other Scrollbar Routines.
+                                                              (line  28)
+* fl_set_scrollbar_repeat():             Other Scrollbar Routines.
+                                                              (line  41)
+* fl_set_scrollbar_size():               Scrollbar Attributes.
+                                                              (line  16)
+* fl_set_scrollbar_type():               Initialization.      (line 232)
+* fl_set_scrollbar_value():              Other Scrollbar Routines.
+                                                              (line   7)
+* fl_set_select_item():                  Other Select Routines.
+                                                              (line  43)
+* fl_set_select_items():                 Adding Select Objects.
+                                                              (line 109)
+* fl_set_select_policy():                Select Interaction.  (line  72)
+* fl_set_select_popup():                 Adding Select Objects.
+                                                              (line 131)
+* fl_set_select_text_align():            Select Attributes.   (line  17)
+* fl_set_select_text_color():            Select Attributes.   (line  10)
+* fl_set_select_text_font():             Select Attributes.   (line  26)
+* fl_set_slider_bounds():                Sliders.             (line  17)
+* fl_set_slider_bounds() <1>:            Other Slider Routines.
+                                                              (line   6)
+* fl_set_slider_filter():                Slider Attributes.   (line  34)
+* fl_set_slider_mouse_buttons():         Other Slider Routines.
+                                                              (line  26)
+* fl_set_slider_precision():             Slider Attributes.   (line  25)
+* fl_set_slider_size():                  Slider Attributes.   (line  14)
+* fl_set_slider_value():                 Sliders.             (line  17)
+* fl_set_slider_value() <1>:             Other Slider Routines.
+                                                              (line   6)
+* fl_set_spinner_bounds():               Other Spinner Routines.
+                                                              (line  15)
+* fl_set_spinner_precision():            Other Spinner Routines.
+                                                              (line  34)
+* fl_set_spinner_step():                 Other Spinner Routines.
+                                                              (line  27)
+* fl_set_spinner_value():                Other Spinner Routines.
+                                                              (line   6)
+* fl_set_tabfolder_autofit():            Other Folder Routines.
+                                                              (line 112)
+* fl_set_tabfolder_offset():             Other Folder Routines.
+                                                              (line  50)
+* fl_set_tabstop():                      Initialization.      (line 283)
+* fl_set_text_clipping():                Clipping.            (line  49)
+* fl_set_thumbwheel_bounds():            Other Thumbwheel Routines.
+                                                              (line   7)
+* fl_set_thumbwheel_crossover():         Other Thumbwheel Routines.
+                                                              (line  21)
+* fl_set_thumbwheel_step():              Other Thumbwheel Routines.
+                                                              (line  25)
+* fl_set_thumbwheel_value():             Other Thumbwheel Routines.
+                                                              (line   7)
+* fl_set_timer():                        Other Timer Routines.
+                                                              (line   6)
+* fl_set_timer_countup():                Other Timer Routines.
+                                                              (line  17)
+* fl_set_timer_filter():                 Other Timer Routines.
+                                                              (line  31)
+* fl_set_tooltip_boxtype():              Tool Tips.           (line  23)
+* fl_set_tooltip_boxtype() <1>:          Object Attributes.   (line 129)
+* fl_set_tooltip_color():                Tool Tips.           (line  23)
+* fl_set_tooltip_color() <1>:            Object Attributes.   (line 129)
+* fl_set_tooltip_font():                 Tool Tips.           (line  23)
+* fl_set_tooltip_font() <1>:             Object Attributes.   (line 129)
+* fl_set_tooltip_lalign():               Tool Tips.           (line  23)
+* fl_set_visualID():                     Initialization.      (line  85)
+* fl_set_xyplot_alphaxtics():            Other XYPlot Routines.
+                                                              (line  34)
+* fl_set_xyplot_alphaytics():            Other XYPlot Routines.
+                                                              (line  34)
+* fl_set_xyplot_data():                  XYPlot Interaction.  (line  51)
+* fl_set_xyplot_data_double():           XYPlot Interaction.  (line  51)
+* fl_set_xyplot_file():                  XYPlot Interaction.  (line  68)
+* fl_set_xyplot_fixed_xaxis():           Other XYPlot Routines.
+                                                              (line  81)
+* fl_set_xyplot_fixed_yaxis():           Other XYPlot Routines.
+                                                              (line  81)
+* fl_set_xyplot_grid_linestyle():        Other XYPlot Routines.
+                                                              (line  72)
+* fl_set_xyplot_inspect():               XYPlot Interaction.  (line  88)
+* fl_set_xyplot_interpolate():           Other XYPlot Routines.
+                                                              (line 265)
+* fl_set_xyplot_key():                   Other XYPlot Routines.
+                                                              (line 242)
+* fl_set_xyplot_keys():                  Other XYPlot Routines.
+                                                              (line 254)
+* fl_set_xyplot_key_font():              Other XYPlot Routines.
+                                                              (line 263)
+* fl_set_xyplot_key_position():          Other XYPlot Routines.
+                                                              (line 246)
+* fl_set_xyplot_linewidth():             Other XYPlot Routines.
+                                                              (line 274)
+* fl_set_xyplot_log_minor_xtics():       Other XYPlot Routines.
+                                                              (line  24)
+* fl_set_xyplot_log_minor_ytics():       Other XYPlot Routines.
+                                                              (line  24)
+* fl_set_xyplot_mark_active():           XYPlot Interaction.  (line  47)
+* fl_set_xyplot_maxoverlays():           Other XYPlot Routines.
+                                                              (line 199)
+* fl_set_xyplot_mouse_buttons():         Other XYPlot Routines.
+                                                              (line 330)
+* fl_set_xyplot_overlay_type():          Other XYPlot Routines.
+                                                              (line 173)
+* fl_set_xyplot_symbol():                Other XYPlot Routines.
+                                                              (line 102)
+* fl_set_xyplot_symbolsize():            Other XYPlot Routines.
+                                                              (line  96)
+* fl_set_xyplot_xbounds():               Other XYPlot Routines.
+                                                              (line 139)
+* fl_set_xyplot_xgrid():                 Other XYPlot Routines.
+                                                              (line  60)
+* fl_set_xyplot_xscale():                Other XYPlot Routines.
+                                                              (line 280)
+* fl_set_xyplot_xtics():                 Other XYPlot Routines.
+                                                              (line   8)
+* fl_set_xyplot_ybounds():               Other XYPlot Routines.
+                                                              (line 139)
+* fl_set_xyplot_ygrid():                 Other XYPlot Routines.
+                                                              (line  60)
+* fl_set_xyplot_yscale():                Other XYPlot Routines.
+                                                              (line 280)
+* fl_set_xyplot_ytics():                 Other XYPlot Routines.
+                                                              (line   8)
+* fl_share_canvas_colormap():            Other Canvas Routines.
+                                                              (line  36)
+* fl_showpup():                          XPopup Attributes.   (line  70)
+* fl_show_alert():                       Messages and Questions.
+                                                              (line  52)
+* fl_show_alert_f():                     Messages and Questions.
+                                                              (line  60)
+* fl_show_browser_line():                Other Browser Routines.
+                                                              (line 151)
+* fl_show_choice():                      Messages and Questions.
+                                                              (line 130)
+* fl_show_choices():                     Messages and Questions.
+                                                              (line 130)
+* fl_show_colormap():                    Colormap.            (line  11)
+* fl_show_color_chooser():               Color Chooser.       (line  14)
+* fl_show_command_log():                 Command Log.         (line  69)
+* fl_show_errors():                      Initialization.      (line 334)
+* fl_show_form():                        Displaying a Form.   (line   9)
+* fl_show_form() <1>:                    Doing Interaction.   (line   6)
+* fl_show_form_f():                      Doing Interaction.   (line   6)
+* fl_show_form_window():                 Displaying a Form.   (line 178)
+* fl_show_form_window() <1>:             Doing Interaction.   (line 147)
+* fl_show_fselector():                   File Selector.       (line   8)
+* fl_show_input():                       Messages and Questions.
+                                                              (line 157)
+* fl_show_menu_symbol():                 Other Menu Routines. (line 183)
+* fl_show_message():                     Messages and Questions.
+                                                              (line   7)
+* fl_show_messages():                    Messages and Questions.
+                                                              (line  13)
+* fl_show_messages_f():                  Messages and Questions.
+                                                              (line  18)
+* fl_show_object():                      Hiding and Showing.  (line  12)
+* fl_show_object() <1>:                  Object Attributes.   (line 186)
+* fl_show_oneliner():                    Messages and Questions.
+                                                              (line  37)
+* fl_show_question():                    Messages and Questions.
+                                                              (line  92)
+* fl_show_simple_input():                Messages and Questions.
+                                                              (line 176)
+* fl_signal_caught():                    Signals.             (line  72)
+* fl_strdup():                           The Routine fl_add_NEW().
+                                                              (line  45)
+* fl_stuff_clipboard():                  Clipboard.           (line  26)
+* fl_suspend_timer():                    Other Timer Routines.
+                                                              (line  22)
+* fl_to_inside_lalign():                 Label Attributes and Fonts.
+                                                              (line 152)
+* fl_to_outside_lalign():                Label Attributes and Fonts.
+                                                              (line 160)
+* fl_transient():                        Windowing Support.   (line 128)
+* fl_trigger_object():                   Deactivating and Triggering Objects.
+                                                              (line  25)
+* fl_trigger_object() <1>:               Object Attributes.   (line 196)
+* fl_unfreeze_all_forms():               Object Attributes.   (line 160)
+* fl_unfreeze_form():                    Changing Many Attributes.
+                                                              (line  21)
+* fl_unfreeze_form() <1>:                Object Attributes.   (line 152)
+* fl_unset_clipping():                   Clipping.            (line  38)
+* fl_unset_gc_clipping():                Clipping.            (line  57)
+* fl_unset_text_clipping():              Clipping.            (line  49)
+* fl_update_display():                   Displaying a Form.   (line  21)
+* fl_use_fselector():                    File Selector.       (line  43)
+* fl_validate_input():                   Input Interaction.   (line 200)
+* fl_whoami():                           Misc. Functions.     (line  15)
+* fl_winaspect():                        Windowing Support.   (line 106)
+* fl_winbackground():                    Windowing Support.   (line 133)
+* fl_winclose():                         Windowing Support.   (line 184)
+* fl_wincreate():                        Windowing Support.   (line  11)
+* fl_winfocus():                         Windowing Support.   (line 200)
+* fl_wingeometry():                      Windowing Support.   (line  97)
+* fl_winget():                           Drawing Functions.   (line  10)
+* fl_winhide():                          Windowing Support.   (line 179)
+* fl_winicon():                          Windowing Support.   (line 123)
+* fl_winicontitle():                     Windowing Support.   (line 119)
+* fl_winicontitle_f():                   Windowing Support.   (line 119)
+* fl_winisvalid():                       Windowing Support.   (line 192)
+* fl_winmaxsize():                       Windowing Support.   (line  77)
+* fl_winminsize():                       Windowing Support.   (line  77)
+* fl_winmove():                          Windowing Support.   (line 165)
+* fl_winopen():                          Windowing Support.   (line  26)
+* fl_winposition():                      Windowing Support.   (line  91)
+* fl_winreparent():                      Windowing Support.   (line  48)
+* fl_winreshape():                       Windowing Support.   (line 168)
+* fl_winresize():                        Windowing Support.   (line 158)
+* fl_winset():                           Drawing Functions.   (line  10)
+* fl_winshow():                          Windowing Support.   (line  11)
+* fl_winsize():                          Windowing Support.   (line  56)
+* fl_winstepsize():                      Windowing Support.   (line 137)
+* fl_wintitle():                         Windowing Support.   (line 111)
+* fl_wintitle_f():                       Windowing Support.   (line 111)
+* fl_win_to_form():                      General Remarks.     (line  85)
+* fl_XEventsQueued():                    Dealing With Multiple Windows.
+                                                              (line  66)
+* fl_XNextEvent():                       Dealing With Multiple Windows.
+                                                              (line  66)
+* fl_XPeekEvent():                       Dealing With Multiple Windows.
+                                                              (line  66)
+* fl_XPutbackEvent():                    Dealing With Multiple Windows.
+                                                              (line  66)
+* fl_xyplot_s2w():                       Other XYPlot Routines.
+                                                              (line 306)
+* fl_xyplot_w2s():                       Other XYPlot Routines.
+                                                              (line 306)
+
+
+File: xforms.info,  Node: Index of Global Variables,  Next: Index of Constants,  Prev: Index of Functions,  Up: Top
+
+Index of Global Variables
+*************************
+
+ [index ]
+* Menu:
+
+* fl_colormap:                           Global Variables and Macros.
+                                                               (line 69)
+* fl_current_form:                       Global Variables and Macros.
+                                                               (line 17)
+* fl_display:                            Global Variables and Macros.
+                                                               (line 20)
+* fl_dpi:                                Global Variables and Macros.
+                                                               (line 58)
+* FL_EVENT:                              Global Variables and Macros.
+                                                               (line  9)
+* fl_root:                               Global Variables and Macros.
+                                                               (line 33)
+* fl_screen:                             Global Variables and Macros.
+                                                               (line 29)
+* fl_scrh:                               Global Variables and Macros.
+                                                               (line 41)
+* fl_scrw:                               Global Variables and Macros.
+                                                               (line 41)
+* fl_state:                              Global Variables and Macros.
+                                                               (line 52)
+* fl_ul_magic_char:                      Global Variables and Macros.
+                                                               (line 74)
+* fl_visual:                             Global Variables and Macros.
+                                                               (line 64)
+* fl_vmode:                              Global Variables and Macros.
+                                                               (line 44)
+* fl_vroot:                              Global Variables and Macros.
+                                                               (line 36)
+
+
+File: xforms.info,  Node: Index of Constants,  Prev: Index of Global Variables,  Up: Top
+
+Index of Constants
+******************
+
+ [index ]
+* Menu:
+
+* FD_FSELECTOR:                          File Selector.       (line 151)
+* FL DASH:                               Drawing Functions.   (line 159)
+* FL DOT:                                Drawing Functions.   (line 157)
+* FL DOTDASH:                            Drawing Functions.   (line 161)
+* FL LONGDASH:                           Drawing Functions.   (line 163)
+* FL PUP NONE:                           Creating XPopups.    (line 254)
+* FL SOLID:                              Drawing Functions.   (line 156)
+* FL USERDASH:                           Drawing Functions.   (line 165)
+* FL USERDOUBLEDASH:                     Drawing Functions.   (line 169)
+* FLIMAGE_ASPECT:                        Scaling.             (line  23)
+* FLIMAGE_AUTOCOLOR:                     Cropping.            (line  15)
+* FLIMAGE_CENTER:                        Scaling.             (line  25)
+* FLIMAGE_Description:                   Adding New Formats.  (line  12)
+* FLIMAGE_FORMAT_INFO:                   Queries.             (line  14)
+* FLIMAGE_Identify:                      Adding New Formats.  (line  12)
+* FLIMAGE_JPEG_OPTIONS:                  Built-in support.    (line  50)
+* FLIMAGE_NOCENTER:                      Scaling.             (line  27)
+* FLIMAGE_NOCENTER <1>:                  Warping.             (line  67)
+* FLIMAGE_NOSUBPIXEL:                    Rotation.            (line  12)
+* FLIMAGE_NOSUBPIXEL <1>:                Scaling.             (line  20)
+* FLIMAGE_NOSUBPIXEL <2>:                Warping.             (line  67)
+* FLIMAGE_Read_Pixels:                   Adding New Formats.  (line  12)
+* FLIMAGE_SETUP:                         Setup and Configuration.
+                                                              (line  20)
+* FLIMAGE_SHARPEN:                       Convolution.         (line  31)
+* FLIMAGE_SMOOTH:                        Convolution.         (line  30)
+* FLIMAGE_SUBPIXEL:                      Rotation.            (line  12)
+* FLIMAGE_SUBPIXEL <1>:                  Scaling.             (line  21)
+* FLIMAGE_SUBPIXEL <2>:                  Warping.             (line  67)
+* FLIMAGE_TEXT:                          Using Text Strings.  (line  33)
+* FLIMAGE_Write_Image:                   Adding New Formats.  (line  12)
+* FLPS_CONTROL:                          Object Attributes.   (line 286)
+* FL_ACTIVE_XYPLOT:                      XYPlot Types.        (line  25)
+* FL_ALIGN_BOTTOM:                       Label Attributes and Fonts.
+                                                              (line 142)
+* FL_ALIGN_CENTER:                       Label Attributes and Fonts.
+                                                              (line 143)
+* FL_ALIGN_INSIDE:                       Label Attributes and Fonts.
+                                                              (line 157)
+* FL_ALIGN_LEFT:                         Label Attributes and Fonts.
+                                                              (line 140)
+* FL_ALIGN_LEFT_BOTTOM:                  Label Attributes and Fonts.
+                                                              (line 145)
+* FL_ALIGN_LEFT_TOP:                     Label Attributes and Fonts.
+                                                              (line 147)
+* FL_ALIGN_RIGHT:                        Label Attributes and Fonts.
+                                                              (line 140)
+* FL_ALIGN_RIGHT_BOTTOM:                 Label Attributes and Fonts.
+                                                              (line 144)
+* FL_ALIGN_RIGHT_TOP:                    Label Attributes and Fonts.
+                                                              (line 146)
+* FL_ALIGN_TOP:                          Label Attributes and Fonts.
+                                                              (line 141)
+* FL_ALL_FREE:                           Free Object.         (line 159)
+* FL_ALPHASORT:                          File Selector.       (line 286)
+* FL_ALT_MASK:                           Input Attributes.    (line  95)
+* FL_ANALOG_CLOCK:                       Clock Types.         (line   7)
+* FL_APPEVENT_CB:                        Periodic Events and Non-blocking Interaction.
+                                                              (line  28)
+* FL_APPEVENT_CB <1>:                    Using Callback Functions.
+                                                              (line  83)
+* FL_APPEVENT_CB <2>:                    Doing Interaction.   (line 303)
+* FL_APPEVENT_CB <3>:                    Doing Interaction.   (line 309)
+* FL_APPEVENT_CB <4>:                    Idle Callbacks and Timeouts.
+                                                              (line  10)
+* FL_ATTRIB:                             Part IV Events.      (line 169)
+* FL_AUTO:                               Other Input Routines.
+                                                              (line  91)
+* FL_AUTO <1>:                           Browser Attributes.  (line 115)
+* FL_AUTO <2>:                           Other FormBrowser Routines.
+                                                              (line  82)
+* FL_BAR_CHART:                          Chart Types.         (line   7)
+* FL_BEGIN_GROUP:                        The Routine fl_add_NEW().
+                                                              (line  33)
+* FL_BEGIN_GROUP <1>:                    Creating Forms.      (line  43)
+* FL_BEING_HIDDEN:                       Displaying a Form.   (line 324)
+* FL_BITMAPBUTTON:                       Adding Button Objects.
+                                                              (line  58)
+* FL_BLACK:                              Color.               (line  36)
+* FL_BLUE:                               Color.               (line  49)
+* FL_BOLDITALIC_STYLE:                   Label Attributes and Fonts.
+                                                              (line  36)
+* FL_BOLD_STYLE:                         Label Attributes and Fonts.
+                                                              (line  34)
+* FL_BOOL:                               Current Support.     (line  43)
+* FL_BORDER_BOX:                         Boxes.               (line  20)
+* FL_BORDER_BOX <1>:                     Box Types.           (line  16)
+* FL_BORDER_FRAME:                       Frame Types.         (line  12)
+* FL_BORDER_FRAME <1>:                   LabelFrame Types.    (line  12)
+* FL_BOTTOM_BCOL:                        Color.               (line  40)
+* FL_BOTTOM_TABFOLDER:                   Folder Types.        (line  10)
+* FL_BROWSER_SCROLL_CALLBACK:            Browser Attributes.  (line 128)
+* FL_BUTTON:                             Adding Button Objects.
+                                                              (line  37)
+* FL_BUTTON_NMENU:                       Adding Nmenu Objects.
+                                                              (line  19)
+* FL_BUTTON_STRUCT:                      Part IV New Buttons. (line  33)
+* FL_BUTTON_TOUCH_NMENU:                 Adding Nmenu Objects.
+                                                              (line  24)
+* FL_CALLBACKPTR:                        Using Callback Functions.
+                                                              (line  17)
+* FL_CASEALPHASORT:                      File Selector.       (line 299)
+* FL_CHARTREUSE:                         Color.               (line  65)
+* FL_CHART_MAX:                          Other Chart Routines.
+                                                              (line  59)
+* FL_CHECKBUTTON:                        Adding Button Objects.
+                                                              (line  53)
+* FL_CIRCLE_XYPLOT:                      XYPlot Types.        (line  10)
+* FL_CLICK_TIMEOUT:                      Part IV Events.      (line 112)
+* FL_CMD_OPT:                            Current Support.     (line  16)
+* FL_COL1:                               Color.               (line  39)
+* FL_CONTINUOUS_FREE:                    Free Object.         (line 155)
+* FL_CONTROL_MASK:                       Input Attributes.    (line  94)
+* FL_COORD_centiMM:                      Initialization.      (line 197)
+* FL_COORD_centiPOINT:                   Initialization.      (line 197)
+* FL_COORD_MM:                           Initialization.      (line 197)
+* FL_COORD_PIXEL:                        Initialization.      (line 197)
+* FL_COORD_POINT:                        Initialization.      (line 197)
+* FL_CYAN:                               Color.               (line  53)
+* FL_DARKCYAN:                           Color.               (line  60)
+* FL_DARKER_COL1:                        Color.               (line  45)
+* FL_DARKGOLD:                           Color.               (line  58)
+* FL_DARKORANGE:                         Color.               (line  63)
+* FL_DARKTOMATO:                         Color.               (line  61)
+* FL_DARKVIOLET:                         Color.               (line  66)
+* FL_DASHED_XYPLOT:                      XYPlot Types.        (line  17)
+* FL_DATE_INPUT:                         Input Types.         (line  20)
+* FL_DBLCLICK:                           Free Object.         (line  91)
+* FL_DBLCLICK <1>:                       Part IV Events.      (line 110)
+* FL_DEEPPINK:                           Color.               (line  64)
+* FL_DESELECTABLE_HOLD_BROWSER:          Browser Types.       (line  19)
+* FL_DIAL_CCW:                           Other Dial Routines. (line  45)
+* FL_DIAL_CW:                            Other Dial Routines. (line  45)
+* FL_DIGITAL_CLOCK:                      Clock Types.         (line   8)
+* FL_Dirlist:                            File Selector.       (line 204)
+* FL_DIRLIST_FILTER:                     File Selector.       (line 269)
+* FL_DODGERBLUE:                         Color.               (line  68)
+* FL_DOS_INPUT_MODE:                     Input Interaction.   (line 225)
+* FL_DOTDASHED_XYPLOT:                   XYPlot Types.        (line  21)
+* FL_DOTTED_XYPLOT:                      XYPlot Types.        (line  19)
+* FL_DOWN_BOX:                           Boxes.               (line  18)
+* FL_DOWN_BOX <1>:                       Box Types.           (line  10)
+* FL_DOWN_FRAME:                         Frame Types.         (line  10)
+* FL_DOWN_FRAME <1>:                     LabelFrame Types.    (line  10)
+* FL_DRAW:                               Free Object.         (line  34)
+* FL_DRAW <1>:                           Part IV Events.      (line  14)
+* FL_DRAWLABEL:                          Free Object.         (line  57)
+* FL_DRAWLABEL <1>:                      Part IV Events.      (line  60)
+* FL_DROPLIST_CHOICE:                    Choice Types.        (line  13)
+* FL_DROPLIST_SELECT:                    Adding Select Objects.
+                                                              (line  20)
+* FL_East:                               Displaying a Form.   (line 237)
+* FL_EditKeymap:                         Input Attributes.    (line  43)
+* FL_EMBOSSED_BOX:                       Boxes.               (line  28)
+* FL_EMBOSSED_FRAME:                     Frame Types.         (line  16)
+* FL_EMBOSSED_FRAME <1>:                 LabelFrame Types.    (line  16)
+* FL_EMBOSSED_STYLE:                     Label Attributes and Fonts.
+                                                              (line  47)
+* FL_EMPTY_XYPLOT:                       XYPlot Types.        (line  28)
+* FL_END_GROUP:                          Creating Forms.      (line  46)
+* FL_ENGRAVED_FRAME:                     Frame Types.         (line  14)
+* FL_ENGRAVED_FRAME <1>:                 LabelFrame Types.    (line  14)
+* FL_ENGRAVED_STYLE:                     Label Attributes and Fonts.
+                                                              (line  46)
+* FL_ENLARGE_ONLY:                       Other Folder Routines.
+                                                              (line 118)
+* FL_ENTER:                              Free Object.         (line  64)
+* FL_ENTER <1>:                          Part IV Events.      (line  66)
+* FL_EXCEPT:                             Handling Other Input Sources.
+                                                              (line  27)
+* FL_FILLED_CHART:                       Chart Types.         (line  12)
+* FL_FILL_DIAL:                          Dial Types.          (line  15)
+* FL_FILL_XYPLOT:                        XYPlot Types.        (line  12)
+* FL_FIT:                                Other Folder Routines.
+                                                              (line 116)
+* FL_FIXEDBOLDITALIC_STYLE:              Label Attributes and Fonts.
+                                                              (line  40)
+* FL_FIXEDBOLD_STYLE:                    Label Attributes and Fonts.
+                                                              (line  38)
+* FL_FIXEDITALIC_STYLE:                  Label Attributes and Fonts.
+                                                              (line  39)
+* FL_FIXED_STYLE:                        Label Attributes and Fonts.
+                                                              (line  37)
+* FL_FLAT_BOX:                           Boxes.               (line  30)
+* FL_FLAT_BOX <1>:                       Box Types.           (line  13)
+* FL_FLOAT:                              Current Support.     (line  49)
+* FL_FLOAT <1>:                          Current Support.     (line  51)
+* FL_FLOAT <2>:                          Current Support.     (line  53)
+* FL_FLOAT_INPUT:                        Input Types.         (line  10)
+* FL_FLOAT_SPINNER:                      Spinner Types.       (line  11)
+* FL_FOCUS:                              Free Object.         (line 107)
+* FL_FOCUS <1>:                          Part IV Events.      (line 124)
+* FL_FORM_ATACTIVATE:                    Dealing With Multiple Windows.
+                                                              (line  32)
+* FL_FORM_ATACTIVATE <1>:                Doing Interaction.   (line 264)
+* FL_FORM_ATDEACTIVATE:                  Dealing With Multiple Windows.
+                                                              (line  32)
+* FL_FORM_ATDEACTIVATE <1>:              Doing Interaction.   (line 264)
+* FL_FRAME_BOX:                          Boxes.               (line  24)
+* FL_FRAME_BOX <1>:                      Box Types.           (line  19)
+* FL_FREEMEM:                            Free Object.         (line 128)
+* FL_FREEMEM <1>:                        Part IV Events.      (line 181)
+* FL_FREEMEM <2>:                        Part IV Events.      (line 181)
+* FL_FREE_COL1:                          Color.               (line  69)
+* FL_FREE_SIZE:                          Displaying a Form.   (line  89)
+* FL_FULLBORDER:                         Displaying a Form.   (line 132)
+* FL_FULLBORDER <1>:                     Doing Interaction.   (line  85)
+* FL_GREEN:                              Color.               (line  50)
+* FL_GRID_MAJOR:                         Other XYPlot Routines.
+                                                              (line  65)
+* FL_GRID_MINOR:                         Other XYPlot Routines.
+                                                              (line  67)
+* FL_GRID_NONE:                          Other XYPlot Routines.
+                                                              (line  64)
+* FL_HANDLEPTR:                          Part IV The Type FL_OBJECT.
+                                                              (line 328)
+* FL_HANDLEPTR <1>:                      Part IV Using a Pre-emptive Handler.
+                                                              (line  26)
+* FL_HANDLEPTR <2>:                      Object Events.       (line  20)
+* FL_HANDLE_CANVAS:                      Canvas Interaction.  (line  21)
+* FL_HIDDEN_BUTTON:                      Button Types.        (line  23)
+* FL_HIDDEN_INPUT:                       Input Types.         (line  31)
+* FL_HIDDEN_RET_BUTTON:                  Button Types.        (line  32)
+* FL_HIDDEN_TIMER:                       Timer Types.         (line  12)
+* FL_HOLD_BROWSER:                       Browser Types.       (line  15)
+* FL_HORBAR_CHART:                       Chart Types.         (line   8)
+* FL_HOR_BROWSER_SLIDER:                 Slider Types.        (line  28)
+* FL_HOR_FILL_SLIDER:                    Slider Types.        (line  16)
+* FL_HOR_NICE_SCROLLBAR:                 Scrollbar Types.     (line  22)
+* FL_HOR_NICE_SLIDER:                    Slider Types.        (line  22)
+* FL_HOR_PLAIN_SCROLLBAR:                Scrollbar Types.     (line  28)
+* FL_HOR_PROGRESS_BAR:                   Slider Types.        (line  34)
+* FL_HOR_SCROLLBAR:                      Scrollbar Types.     (line  10)
+* FL_HOR_SLIDER:                         Slider Types.        (line  10)
+* FL_HOR_THIN_SCROLLBAR:                 Scrollbar Types.     (line  16)
+* FL_HOR_THUMBWHEEL:                     Thumbwheel Types.    (line  12)
+* FL_HUGE_SIZE:                          Label Attributes and Fonts.
+                                                              (line  23)
+* FL_IMAGE:                              The FL_IMAGE Structure.
+                                                              (line   9)
+* FL_IMAGE_CI:                           Supported image types.
+                                                              (line  15)
+* FL_IMAGE_FLEX:                         Supported image types.
+                                                              (line  15)
+* FL_IMAGE_GRAY:                         Supported image types.
+                                                              (line  15)
+* FL_IMAGE_GRAY16:                       Supported image types.
+                                                              (line  15)
+* FL_IMAGE_MONO:                         Supported image types.
+                                                              (line  15)
+* FL_IMAGE_PACKED:                       Supported image types.
+                                                              (line  15)
+* FL_IMAGE_RGB:                          Supported image types.
+                                                              (line  15)
+* FL_IMPULSE_XYPLOT:                     XYPlot Types.        (line  23)
+* FL_INACTIVE:                           Color.               (line  55)
+* FL_INACTIVE_FREE:                      Free Object.         (line 144)
+* FL_INCLUDE_VERSION:                    Version Information. (line  14)
+* FL_INDIANRED:                          Color.               (line  47)
+* FL_INOUT_BUTTON:                       Button Types.        (line  26)
+* FL_INPUT_DDMM:                         Input Interaction.   (line 192)
+* FL_INPUT_END_EVENT_ALWAYS:             Input Interaction.   (line 138)
+* FL_INPUT_END_EVENT_CLASSIC:            Input Interaction.   (line 139)
+* FL_INPUT_FREE:                         Free Object.         (line 147)
+* FL_INPUT_MMDD:                         Input Interaction.   (line 192)
+* FL_INPUT_VALIDATOR:                    Input Interaction.   (line 154)
+* FL_INT:                                Current Support.     (line  45)
+* FL_INT_INPUT:                          Input Types.         (line  15)
+* FL_INT_SPINNER:                        Spinner Types.       (line   8)
+* FL_INVALID:                            Input Interaction.   (line 163)
+* FL_INVISIBLE:                          Displaying a Form.   (line 318)
+* FL_INVISIBLE_CURSOR:                   Cursors.             (line  20)
+* FL_INVISIBLE_POSITIONER:               Positioner Types.    (line  13)
+* FL_IOPT:                               Initialization.      (line 121)
+* FL_IO_CALLBACK:                        Handling Other Input Sources.
+                                                              (line  12)
+* FL_ITALIC_STYLE:                       Label Attributes and Fonts.
+                                                              (line  35)
+* FL_JUMP_SCROLL:                        Other FormBrowser Routines.
+                                                              (line  94)
+* FL_KEYPRESS:                           Free Object.         (line 114)
+* FL_KEYPRESS <1>:                       Part IV Events.      (line 132)
+* FL_KEY_ALL:                            Shortcuts.           (line 101)
+* FL_KEY_NORMAL:                         Shortcuts.           (line  87)
+* FL_KEY_SPECIAL:                        Shortcuts.           (line  96)
+* FL_KEY_TAB:                            Shortcuts.           (line  92)
+* FL_LABELBUTTON:                        Adding Button Objects.
+                                                              (line  68)
+* FL_LARGE_SIZE:                         Label Attributes and Fonts.
+                                                              (line  22)
+* FL_LEAVE:                              Free Object.         (line  74)
+* FL_LEAVE <1>:                          Part IV Events.      (line  76)
+* FL_LEFT_BCOL:                          Color.               (line  43)
+* FL_LEFT_MOUSE:                         Part IV Events.      (line  90)
+* FL_LIGHTBUTTON:                        Adding Button Objects.
+                                                              (line  40)
+* FL_LIGHTER_COL1:                       Color.               (line  44)
+* FL_LINEAR:                             Other XYPlot Routines.
+                                                              (line 283)
+* FL_LINEPOINTS_XYPLOT:                  XYPlot Types.        (line  15)
+* FL_LINE_CHART:                         Chart Types.         (line  10)
+* FL_LINE_DIAL:                          Dial Types.          (line  12)
+* FL_LOG:                                Other XYPlot Routines.
+                                                              (line 283)
+* FL_LONG:                               Current Support.     (line  47)
+* FL_LOSE_SELECTION_CB:                  Clipboard.           (line  26)
+* FL_MAGENTA:                            Color.               (line  52)
+* FL_MAXPUPI:                            Creating XPopups.    (line 130)
+* FL_MAX_COLORS:                         Color.               (line  85)
+* FL_MAX_FSELECTOR:                      File Selector.       (line  39)
+* FL_MAX_XYPLOTOVERLAY:                  Other XYPlot Routines.
+                                                              (line 160)
+* FL_MBUTTON1:                           Part IV Events.      (line  90)
+* FL_MBUTTON2:                           Part IV Events.      (line  93)
+* FL_MBUTTON3:                           Part IV Events.      (line  96)
+* FL_MBUTTON4:                           Part IV Events.      (line  99)
+* FL_MBUTTON5:                           Part IV Events.      (line 102)
+* FL_MCOL:                               Color.               (line  42)
+* FL_MEDIUM_SIZE:                        Label Attributes and Fonts.
+                                                              (line  21)
+* FL_MENU_BUTTON:                        Button Types.        (line  14)
+* FL_MENU_SELECT:                        Adding Select Objects.
+                                                              (line  15)
+* FL_MIDDLE_MOUSE:                       Part IV Events.      (line  93)
+* FL_MOTION:                             Free Object.         (line  78)
+* FL_MOTION <1>:                         Part IV Events.      (line  80)
+* FL_MTIMESORT:                          File Selector.       (line 290)
+* FL_MULTILINE_INPUT:                    Input Types.         (line  24)
+* FL_MULTI_BROWSER:                      Browser Types.       (line  23)
+* FL_NO:                                 Other Folder Routines.
+                                                              (line 115)
+* FL_NOBORDER:                           Displaying a Form.   (line 138)
+* FL_NOBORDER <1>:                       Doing Interaction.   (line  92)
+* FL_NOEVENT:                            Object Attributes.   (line 247)
+* FL_NoGravity:                          Displaying a Form.   (line 221)
+* FL_NONE:                               File Selector.       (line 285)
+* FL_NORMAL_BITMAP:                      Bitmap Types.        (line   6)
+* FL_NORMAL_BROWSER:                     Browser Types.       (line   8)
+* FL_NORMAL_BUTTON:                      Buttons.             (line  18)
+* FL_NORMAL_BUTTON <1>:                  Button Types.        (line   7)
+* FL_NORMAL_CANVAS:                      Canvas Types.        (line   6)
+* FL_NORMAL_CHOICE:                      Choice Types.        (line   7)
+* FL_NORMAL_CHOICE2:                     Choice Types.        (line  10)
+* FL_NORMAL_COUNTER:                     Counter Types.       (line   9)
+* FL_NORMAL_DIAL:                        Dial Types.          (line   9)
+* FL_NORMAL_FORMBROWSER:                 FormBrowser Types.   (line   6)
+* FL_NORMAL_FREE:                        Free Object.         (line 142)
+* FL_NORMAL_INPUT:                       Input Types.         (line   7)
+* FL_NORMAL_INPUT_MODE:                  Input Interaction.   (line 224)
+* FL_NORMAL_NMENU:                       Adding Nmenu Objects.
+                                                              (line  10)
+* FL_NORMAL_PIXMAP:                      Pixmap Types.        (line   6)
+* FL_NORMAL_POSITIONER:                  Positioner Types.    (line   7)
+* FL_NORMAL_SELECT:                      Adding Select Objects.
+                                                              (line  10)
+* FL_NORMAL_SIZE:                        Label Attributes and Fonts.
+                                                              (line  20)
+* FL_NORMAL_STYLE:                       Label Attributes and Fonts.
+                                                              (line  34)
+* FL_NORMAL_TEXT:                        Text Types.          (line   6)
+* FL_NORMAL_TIMER:                       Timer Types.         (line   7)
+* FL_NORMAL_TOUCH_NMENU:                 Adding Nmenu Objects.
+                                                              (line  14)
+* FL_NORMAL_XYPLOT:                      XYPlot Types.        (line   7)
+* FL_North:                              Displaying a Form.   (line 228)
+* FL_NorthEast:                          Displaying a Form.   (line 231)
+* FL_NorthWest:                          Displaying a Form.   (line 225)
+* FL_NO_BOX:                             Boxes.               (line  15)
+* FL_NO_BOX <1>:                         Box Types.           (line  37)
+* FL_NO_FRAME:                           Frame Types.         (line   7)
+* FL_NO_FRAME <1>:                       LabelFrame Types.    (line   7)
+* FL_OFF:                                Other Input Routines.
+                                                              (line  94)
+* FL_OFF <1>:                            Browser Attributes.  (line 113)
+* FL_OFF <2>:                            Other FormBrowser Routines.
+                                                              (line  80)
+* FL_ON:                                 Other Input Routines.
+                                                              (line  92)
+* FL_ON <1>:                             Browser Attributes.  (line 112)
+* FL_ON <2>:                             Other FormBrowser Routines.
+                                                              (line  79)
+* FL_ORCHID:                             Color.               (line  59)
+* FL_OTHER:                              Free Object.         (line 132)
+* FL_OTHER <1>:                          Part IV Events.      (line 186)
+* FL_OVAL3D_DOWNBOX:                     Boxes.               (line  46)
+* FL_OVAL3D_UPBOX:                       Boxes.               (line  44)
+* FL_OVAL_BOX:                           Boxes.               (line  38)
+* FL_OVAL_BOX <1>:                       Box Types.           (line  34)
+* FL_OVAL_FRAME:                         Frame Types.         (line  20)
+* FL_OVAL_FRAME <1>:                     LabelFrame Types.    (line  20)
+* FL_OVERLAY_POSITIONER:                 Positioner Types.    (line  10)
+* FL_PACKED:                             The FL_IMAGE Structure.
+                                                              (line   9)
+* FL_PALEGREEN:                          Color.               (line  57)
+* FL_PCBITS:                             The FL_IMAGE Structure.
+                                                              (line   9)
+* FL_PCMAX:                              The FL_IMAGE Structure.
+                                                              (line   9)
+* FL_PIE_CHART:                          Chart Types.         (line  16)
+* FL_PIXMAPBUTTON:                       Adding Button Objects.
+                                                              (line  62)
+* FL_PLACE GEOMETRY:                     Doing Interaction.   (line  34)
+* FL_PLACE ICONIC:                       Doing Interaction.   (line  75)
+* FL_PLACE_ASPECT:                       Displaying a Form.   (line  48)
+* FL_PLACE_ASPECT <1>:                   Doing Interaction.   (line  40)
+* FL_PLACE_CENTER:                       Displaying a Form.   (line  58)
+* FL_PLACE_CENTER <1>:                   Doing Interaction.   (line  50)
+* FL_PLACE_CENTERFREE:                   Displaying a Form.   (line  79)
+* FL_PLACE_CENTERFREE <1>:               Doing Interaction.   (line  71)
+* FL_PLACE_FREE:                         Displaying a Form.   (line  68)
+* FL_PLACE_FREE <1>:                     Doing Interaction.   (line  60)
+* FL_PLACE_FULLSCREEN:                   Displaying a Form.   (line  63)
+* FL_PLACE_FULLSCREEN <1>:               Doing Interaction.   (line  55)
+* FL_PLACE_GEOMETRY:                     Displaying a Form.   (line  43)
+* FL_PLACE_HOTSPOT:                      Displaying a Form.   (line  74)
+* FL_PLACE_HOTSPOT <1>:                  Doing Interaction.   (line  66)
+* FL_PLACE_ICONIC:                       Displaying a Form.   (line  83)
+* FL_PLACE_MOUSE:                        Displaying a Form.   (line  52)
+* FL_PLACE_MOUSE <1>:                    Doing Interaction.   (line  44)
+* FL_PLACE_POSITION:                     Displaying a Form.   (line  39)
+* FL_PLACE_POSITION <1>:                 Doing Interaction.   (line  30)
+* FL_PLACE_SIZE:                         Displaying a Form.   (line  35)
+* FL_PLACE_SIZE <1>:                     Doing Interaction.   (line  26)
+* FL_POINT:                              Drawing Functions.   (line  43)
+* FL_POINTS_XYPLOT:                      XYPlot Types.        (line  14)
+* FL_POINTS_XYPLOT <1>:                  XYPlot Types.        (line  14)
+* FL_POPUP:                              Adding Popups.       (line 343)
+* FL_POPUP_BACKGROUND_COLOR:             Popup Attributes.    (line  80)
+* FL_POPUP_CB:                           Adding Popups.       (line 211)
+* FL_POPUP_CHECKED:                      Adding Nmenu Objects.
+                                                              (line  96)
+* FL_POPUP_CHECKED <1>:                  Adding Popups.       (line 335)
+* FL_POPUP_CHECKED <2>:                  Other Popup Routines.
+                                                              (line  52)
+* fl_popup_delete():                     Adding Popups.       (line 398)
+* FL_POPUP_DISABLED:                     Adding Popups.       (line 330)
+* FL_POPUP_DISABLED <1>:                 Other Popup Routines.
+                                                              (line  49)
+* FL_POPUP_DISABLED_TEXT_COLOR:          Popup Attributes.    (line  91)
+* fl_popup_do():                         Popup Interaction.   (line   6)
+* FL_POPUP_DRAG_SELECT:                  Select Interaction.  (line  80)
+* FL_POPUP_DRAG_SELECT <1>:              Nmenu Interaction.   (line  62)
+* FL_POPUP_DRAG_SELECT <2>:              Popup Interaction.   (line  71)
+* FL_POPUP_DSABLED:                      Adding Nmenu Objects.
+                                                              (line  89)
+* FL_POPUP_ENTRY:                        Adding Popups.       (line 292)
+* FL_POPUP_HIDDEN:                       Adding Nmenu Objects.
+                                                              (line  92)
+* FL_POPUP_HIDDEN <1>:                   Adding Popups.       (line 333)
+* FL_POPUP_HIDDEN <2>:                   Other Popup Routines.
+                                                              (line  50)
+* FL_POPUP_HIGHLIGHT_COLOR:              Popup Attributes.    (line  81)
+* FL_POPUP_HIGHLIGHT_TEXT_COLOR:         Popup Attributes.    (line  88)
+* fl_popup_insert_entries():             Adding Popups.       (line 386)
+* FL_POPUP_ITEM:                         Adding Popups.       (line 416)
+* FL_POPUP_LINE:                         Adding Popups.       (line 323)
+* FL_POPUP_NONE:                         Adding Nmenu Objects.
+                                                              (line  86)
+* FL_POPUP_NONE <1>:                     Adding Popups.       (line 329)
+* FL_POPUP_NORMAL:                       Adding Nmenu Objects.
+                                                              (line  69)
+* FL_POPUP_NORMAL <1>:                   Adding Popups.       (line 311)
+* FL_POPUP_NORMAL_SELECT:                Select Interaction.  (line  76)
+* FL_POPUP_NORMAL_SELECT <1>:            Nmenu Interaction.   (line  58)
+* FL_POPUP_NORMAL_SELECT <2>:            Popup Interaction.   (line  69)
+* FL_POPUP_RADIO:                        Adding Nmenu Objects.
+                                                              (line  76)
+* FL_POPUP_RADIO <1>:                    Adding Popups.       (line 315)
+* FL_POPUP_RADIO_COLOR:                  Popup Attributes.    (line  94)
+* FL_POPUP_RETURN:                       Adding Popups.       (line 238)
+* FL_POPUP_SUB:                          Adding Popups.       (line 319)
+* FL_POPUP_TEXT_COLOR:                   Popup Attributes.    (line  86)
+* FL_POPUP_TITLE_COLOR:                  Popup Attributes.    (line  84)
+* FL_POPUP_TOGGLE:                       Adding Nmenu Objects.
+                                                              (line  72)
+* FL_POPUP_TOGGLE <1>:                   Adding Popups.       (line 312)
+* FL_POSITIONER_INVALID:                 Other Positioner Routines.
+                                                              (line  43)
+* FL_POSITIONER_REPLACED:                Other Positioner Routines.
+                                                              (line  47)
+* FL_POSITIONER_VALID:                   Other Positioner Routines.
+                                                              (line  45)
+* FL_POSITIONER_VALIDATOR:               Other Positioner Routines.
+                                                              (line  33)
+* FL_PREEMPT:                            Part IV Using a Pre-emptive Handler.
+                                                              (line  46)
+* FL_PREEMPT <1>:                        Form Events.         (line  43)
+* FL_PULLDOWN_MENU:                      Menu Types.          (line  10)
+* FL_PUP_BOX:                            Other Menu Routines. (line 142)
+* FL_PUP_BOX <1>:                        Creating XPopups.    (line 258)
+* FL_PUP_CB:                             XPopup Interaction.  (line  40)
+* FL_PUP_CHECK:                          Other Menu Routines. (line 155)
+* FL_PUP_CHECK <1>:                      Creating XPopups.    (line 264)
+* FL_PUP_ENTERCB:                        XPopup Interaction.  (line  63)
+* FL_PUP_ENTRY:                          Other Menu Routines. (line  78)
+* FL_PUP_ENTRY <1>:                      Creating XPopups.    (line 219)
+* FL_PUP_GREY:                           Other Menu Routines. (line 151)
+* FL_PUP_GREY <1>:                       Creating XPopups.    (line 255)
+* FL_PUP_LEAVECB:                        XPopup Interaction.  (line  63)
+* FL_PUP_NONE:                           Other Menu Routines. (line 139)
+* FL_PUP_RADIO:                          Other Menu Routines. (line 146)
+* FL_PUP_RADIO <1>:                      Creating XPopups.    (line 260)
+* FL_PUSH:                               Free Object.         (line  83)
+* FL_PUSH <1>:                           Part IV Events.      (line  85)
+* FL_PUSH_BUTTON:                        Buttons.             (line  18)
+* FL_PUSH_BUTTON <1>:                    Button Types.        (line  11)
+* FL_PUSH_MENU:                          Menu Types.          (line   7)
+* FL_RADIO_BUTTON:                       Buttons.             (line  18)
+* FL_RADIO_BUTTON <1>:                   Button Types.        (line  20)
+* FL_RALPHASORT:                         File Selector.       (line 288)
+* FL_RAW_CALLBACK:                       Form Events.         (line  13)
+* FL_RCASEALPHASORT:                     File Selector.       (line 301)
+* FL_READ:                               Handling Other Input Sources.
+                                                              (line  21)
+* FL_RED:                                Color.               (line  48)
+* FL_RELEASE:                            Free Object.         (line  87)
+* FL_RELEASE <1>:                        Part IV Events.      (line 105)
+* FL_RESIZE_ALL:                         Displaying a Form.   (line 211)
+* FL_RESIZE_NONE:                        Displaying a Form.   (line 202)
+* FL_RESIZE_X:                           Displaying a Form.   (line 205)
+* FL_RESIZE_Y:                           Displaying a Form.   (line 208)
+* FL_resource:                           Current Support.     (line  32)
+* FL_RETURN_ALWAYS:                      Simple Interaction.  (line 120)
+* FL_RETURN_BUTTON:                      Button Types.        (line  29)
+* FL_RETURN_CHANGED:                     Simple Interaction.  (line  98)
+* FL_RETURN_DESELECTION:                 Simple Interaction.  (line 116)
+* FL_RETURN_END:                         Simple Interaction.  (line 103)
+* FL_RETURN_END_CHANGED:                 Simple Interaction.  (line 108)
+* FL_RETURN_NONE:                        Simple Interaction.  (line 124)
+* FL_RETURN_SELECTION:                   Simple Interaction.  (line 112)
+* FL_REVISION:                           Version Information. (line  11)
+* FL_RFLAT_BOX:                          Boxes.               (line  33)
+* FL_RFLAT_BOX <1>:                      Box Types.           (line  28)
+* FL_RIGHT_BCOL:                         Color.               (line  41)
+* FL_RIGHT_MOUSE:                        Part IV Events.      (line  96)
+* FL_RINGBELL:                           Input Interaction.   (line 168)
+* FL_RMTIMESORT:                         File Selector.       (line 292)
+* FL_ROUND3DBUTTON:                      Adding Button Objects.
+                                                              (line  49)
+* FL_ROUNDBUTTON:                        Adding Button Objects.
+                                                              (line  44)
+* FL_ROUNDED3D_DOWNBOX:                  Boxes.               (line  42)
+* FL_ROUNDED3D_UPBOX:                    Boxes.               (line  40)
+* FL_ROUNDED_BOX:                        Boxes.               (line  26)
+* FL_ROUNDED_BOX <1>:                    Box Types.           (line  25)
+* FL_ROUNDED_FRAME:                      Frame Types.         (line  18)
+* FL_ROUNDED_FRAME <1>:                  LabelFrame Types.    (line  18)
+* FL_RSHADOW_BOX:                        Boxes.               (line  36)
+* FL_RSHADOW_BOX <1>:                    Box Types.           (line  31)
+* FL_RSIZESORT:                          File Selector.       (line 297)
+* FL_RTYPE:                              Current Support.     (line  41)
+* FL_SCROLLBARBUTTON:                    Adding Button Objects.
+                                                              (line  72)
+* FL_SCROLLDOWN_MOUSE:                   Part IV Events.      (line 102)
+* FL_SCROLLUP_MOUSE:                     Part IV Events.      (line  99)
+* FL_SECRET_INPUT:                       Input Types.         (line  27)
+* FL_SELECTION_CB:                       Clipboard.           (line  45)
+* FL_SELECT_BROWSER:                     Browser Types.       (line  11)
+* FL_SHADOW_BOX:                         Boxes.               (line  22)
+* FL_SHADOW_BOX <1>:                     Box Types.           (line  22)
+* FL_SHADOW_STYLE:                       Label Attributes and Fonts.
+                                                              (line  45)
+* FL_SHORT:                              Current Support.     (line  42)
+* FL_SHORTCUT:                           Dealing With Multiple Windows.
+                                                              (line 129)
+* FL_SHORTCUT <1>:                       Free Object.         (line 124)
+* FL_SHORTCUT <2>:                       Other Button Routines.
+                                                              (line  31)
+* FL_SHORTCUT <3>:                       Part IV Events.      (line 143)
+* FL_SIGNAL_HANDLER:                     Signals.             (line  17)
+* FL_SIMPLE_COUNTER:                     Counter Types.       (line  12)
+* FL_SIZESORT:                           File Selector.       (line 295)
+* FL_SLATEBLUE:                          Color.               (line  46)
+* FL_SLIDER_MAX_PREC:                    Slider Attributes.   (line  29)
+* FL_SLIDER_WIDTH:                       Slider Attributes.   (line  17)
+* FL_SLIDER_WIDTH <1>:                   Scrollbar Attributes.
+                                                              (line  18)
+* FL_SMALL_SIZE:                         Label Attributes and Fonts.
+                                                              (line  19)
+* FL_SMOOTH_SCROLL:                      Other FormBrowser Routines.
+                                                              (line  91)
+* FL_South:                              Displaying a Form.   (line 243)
+* FL_SouthEast:                          Displaying a Form.   (line 246)
+* FL_SouthWest:                          Displaying a Form.   (line 240)
+* FL_SPECIALPIE_CHART:                   Chart Types.         (line  18)
+* FL_SPIKE_CHART:                        Chart Types.         (line  14)
+* FL_SPRINGGREEN:                        Color.               (line  67)
+* FL_SQUARE_XYPLOT:                      XYPlot Types.        (line   8)
+* FL_State:                              General Remarks.     (line  18)
+* FL_STEP:                               Free Object.         (line 118)
+* FL_STEP <1>:                           Part IV Events.      (line 147)
+* FL_STRING:                             Current Support.     (line  51)
+* FL_TIMEOUT_CALLBACK:                   Periodic Events and Non-blocking Interaction.
+                                                              (line  48)
+* FL_TIMEOUT_CALLBACK <1>:               Idle Callbacks and Timeouts.
+                                                              (line  37)
+* FL_TIMER_FILTER:                       Other Timer Routines.
+                                                              (line  31)
+* FL_TIMESBOLDITALIC_STYLE:              Label Attributes and Fonts.
+                                                              (line  44)
+* FL_TIMESBOLD_STYLE FL:                 Label Attributes and Fonts.
+                                                              (line  42)
+* FL_TIMESITALIC_STYLE:                  Label Attributes and Fonts.
+                                                              (line  43)
+* FL_TIMES_STYLE:                        Label Attributes and Fonts.
+                                                              (line  41)
+* FL_TINY_SIZE:                          Label Attributes and Fonts.
+                                                              (line  19)
+* FL_TOMATO:                             Color.               (line  54)
+* FL_TOP_BCOL:                           Color.               (line  56)
+* FL_TOP_TABFOLDER:                      Folder Types.        (line   7)
+* FL_TOUCH_BUTTON:                       Buttons.             (line  18)
+* FL_TOUCH_BUTTON <1>:                   Button Types.        (line  17)
+* FL_TOUCH_MENU:                         Menu Types.          (line  13)
+* FL_TRANSIENT:                          Displaying a Form.   (line 135)
+* FL_TRANSIENT <1>:                      Doing Interaction.   (line  88)
+* FL_TRIGGER:                            Object Attributes.   (line 244)
+* FL_TRPLCLICK:                          Free Object.         (line  95)
+* FL_TRPLCLICK <1>:                      Part IV Events.      (line 118)
+* FL_UNFOCUS:                            Free Object.         (line 111)
+* FL_UNFOCUS <1>:                        Part IV Events.      (line 129)
+* FL_UPDATE:                             Free Object.         (line 100)
+* FL_UPDATE <1>:                         Part IV Events.      (line 156)
+* FL_UP_BOX:                             Boxes.               (line  16)
+* FL_UP_BOX <1>:                         Box Types.           (line   7)
+* FL_UP_FRAME:                           Frame Types.         (line   8)
+* FL_UP_FRAME <1>:                       LabelFrame Types.    (line   8)
+* FL_USER_CLASS_START:                   The Routine fl_add_NEW().
+                                                              (line  33)
+* FL_VALID:                              Input Interaction.   (line 163)
+* FL_VALUE_TIMER:                        Timer Types.         (line   9)
+* FL_VERSION:                            Version Information. (line   8)
+* FL_VERT_BROWSER_SLIDER:                Slider Types.        (line  25)
+* FL_VERT_FILL_SLIDER:                   Slider Types.        (line  13)
+* FL_VERT_NICE_SCROLLBAR:                Scrollbar Types.     (line  19)
+* FL_VERT_NICE_SLIDER:                   Slider Types.        (line  19)
+* FL_VERT_PLAIN_SCROLLBAR:               Scrollbar Types.     (line  25)
+* FL_VERT_PROGRESS_BAR:                  Slider Types.        (line  31)
+* FL_VERT_SCROLLBAR:                     Scrollbar Types.     (line   7)
+* FL_VERT_SLIDER:                        Slider Types.        (line   7)
+* FL_VERT_THIN_SCROLLBAR:                Scrollbar Types.     (line  13)
+* FL_VERT_THUMBWHEEL:                    Thumbwheel Types.    (line   9)
+* FL_VISIBLE:                            Displaying a Form.   (line 321)
+* FL_West:                               Displaying a Form.   (line 234)
+* FL_WHEAT:                              Color.               (line  62)
+* FL_WHITE:                              Color.               (line  38)
+* FL_WRITE:                              Handling Other Input Sources.
+                                                              (line  24)
+* FL_XYPLOT_SYMBOL:                      Other XYPlot Routines.
+                                                              (line 102)
+* FL_YELLOW:                             Color.               (line  51)
+* ForgetGravity:                         Displaying a Form.   (line 249)
+* FT_BLK:                                File Selector.       (line 238)
+* FT_CHR:                                File Selector.       (line 240)
+* FT_DIR:                                File Selector.       (line 230)
+* FT_FIFO:                               File Selector.       (line 234)
+* FT_FILE:                               File Selector.       (line 229)
+* FT_LINK:                               File Selector.       (line 236)
+* FT_REG:                                File Selector.       (line 228)
+* FT_SOCK:                               File Selector.       (line 232)
+

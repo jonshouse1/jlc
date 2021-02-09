@@ -1,0 +1,14 @@
+\entry{FL_EVENT}{297}{\code {FL_EVENT}}
+\entry{fl_current_form}{297}{\code {fl_current_form}}
+\entry{fl_display}{298}{\code {fl_display}}
+\entry{fl_screen}{298}{\code {fl_screen}}
+\entry{fl_root}{298}{\code {fl_root}}
+\entry{fl_vroot}{298}{\code {fl_vroot}}
+\entry{fl_scrw}{298}{\code {fl_scrw}}
+\entry{fl_scrh}{298}{\code {fl_scrh}}
+\entry{fl_vmode}{298}{\code {fl_vmode}}
+\entry{fl_state}{298}{\code {fl_state}}
+\entry{fl_dpi}{298}{\code {fl_dpi}}
+\entry{fl_visual}{298}{\code {fl_visual}}
+\entry{fl_colormap}{298}{\code {fl_colormap}}
+\entry{fl_ul_magic_char}{299}{\code {fl_ul_magic_char}}

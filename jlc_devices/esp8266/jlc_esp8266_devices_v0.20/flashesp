@@ -1,0 +1,43 @@
+#!/bin/bash
+
+#root@jonspc:/disks/vol1/jon/projects/jlighting_system_NEW/jlc_devices/pyseral/pyserial-master# pip install pyserial
+#root@jonspc:/disks/vol1/jon/projects/jlighting_system_NEW/jlc_devices/pyseral/pyserial-master# pip3 install pyserial
+# apt install pyserial
+
+
+BAUD=115200
+PORT=/dev/ttyUSB0
+#Uncomment "dio" for "Wifi Controller" version of the board
+MODE="--flash_mode dout"
+
+
+MODEL=$1
+if [ "$MODEL" == "" ]; then
+        echo "usage; compile <MODEL>"
+        echo "see flashimages/ for model list"
+        exit 1
+fi
+
+
+
+# Two options:  
+#	-f force update of romfs
+#	-b blank entire 4MB flash, mostly this is to kill the esp internal configuration state at 0x3c something
+
+# Going to Update memory including memory file system segment
+if [ "$1" == "-b" ] || [ "$1" == "--b" ]; then
+	echo "Blanking entire flash"
+	tr '\000' '\377' </dev/zero | dd of=blank.bin bs=1024 count=1k
+	esptool.py --port $PORT --baud $BAUD write_flash $MODE 0x00000 blank.bin
+	rm blank.bin
+	echo
+	echo "Done"
+	echo "Power Cycle module and run ./flashesp again but without the -b option"
+	exit 0
+	stty -F /dev/ttyUSB0 hupcl
+fi
+
+esptool --port $PORT --baud $BAUD write_flash $MODE 0x40000 flashimages/firmware_"$MODEL"/0x40000.bin 0x00000 flashimages/firmware_"$MODEL"/0x00000.bin 0x80000 flashimages/firmware_"$MODEL"/page.mpfs
+
+stty -F "$PORT" hupcl
+gtkterm

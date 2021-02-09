@@ -1,0 +1,14 @@
+<!--- fragment_controlform_timerbuttons -->
+<tr>
+<td colspan="3">&nbsp;&nbsp;
+<table style="height: 80px; margin-left: auto; margin-right: auto;" border="0" width="481" cellspacing="10" cellpadding="0">
+<caption><strong>Relay Test</strong></caption>
+<tbody>
+<tr>
+<td style="text-align: center; align: middle;">
+<button class="button" id="btnon" value="On" onClick="buttonTimerPressed(this.id,0,1)"><h1>On</h1></button>
+</td>
+<td style="text-align: center; align: middle;">
+<button class="button" id="btnoff" value="Off" onClick="buttonTimerPressed(this.id,0,0)"><h1>Off</h1></button>
+</td>
+</table>

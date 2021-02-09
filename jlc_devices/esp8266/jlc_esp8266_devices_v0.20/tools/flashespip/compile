@@ -1,0 +1,5 @@
+#!/bin/bash
+
+gcc flashespip.c -o flashespip
+cp flashespip /usr/bin/
+

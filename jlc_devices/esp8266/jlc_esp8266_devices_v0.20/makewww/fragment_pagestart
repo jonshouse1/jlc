@@ -1,0 +1,14 @@
+#!/bin/bash
+
+#Combine the html fragments into pages
+
+echo "<html>"
+echo ""
+echo "<title>"
+echo "$1</title>"
+echo "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-15\">"
+
+echo "<!---"
+echo "fragment_pagestart, don't directly edit these pages, use make_www instead"
+echo "-->"
+echo ""

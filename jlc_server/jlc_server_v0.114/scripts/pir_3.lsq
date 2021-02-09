@@ -1,0 +1,4 @@
+# Garden lights
+if daylight stop
+group 2 on
+gfd 2 600

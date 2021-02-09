@@ -1,0 +1,133 @@
+#!/bin/bash
+
+# Compile script for JLC devices.  These match "jlcd" Linux server
+# Version 0.6
+
+
+MODEL=$1
+if [ "$MODEL" == "" ]; then
+        echo "usage; compile <MODEL>"
+	echo
+	echo "Models:"
+	echo "DEV_F Devices (lights/relays)"
+	echo -e "\tall"
+	echo -e "\th801"
+	echo -e "\tdmx_5ch_ws2811"
+	echo -e "\tsonoff_relay1"
+	echo -e "\tsonoff_relay_dual"
+	echo -e "\tsonoff_relay4"
+	echo -e "\tsonoff_relay_th10"
+	echo -e "\tpir"
+	echo -e "\tspotlight_1ch"
+	echo -e "\trelay_opto_board"
+	echo
+	echo "DEV_N Devices (Sensors/Switches/Gadgets)"
+	echo -e "\tt1_uk_1c"
+        echo -e "\tt1_uk_2c"
+        echo -e "\tt1_uk_3c"
+	echo -e "\tdoorbell"
+	echo -e "\tmax7219clock"
+	echo -e "\tmax7219clockb"
+	echo -e "\tmax7219_4line_display"
+	echo -e "\toled_tempsens"
+        exit 1
+fi
+
+
+function domake ()
+{
+	# Prepare www directory with contents custom to this switch
+	rm -rf www
+	cd makewww
+	./make_www "$MODEL"
+	cd ..
+
+	# *******************************************************************
+	# Make firmware directory for target
+	if [ -d firmware_"$MODEL" ]; then
+		rm -rf firmware_"$MODEL"
+	fi
+
+	# ensure a complete compile each time
+	make -f makefiles/Makefile_"$MODEL" clean
+	retval=$?
+	if [ $retval -ne 0 ]; then
+		echo "Compile failed"
+		exit 1
+	fi
+
+	touch www/list
+	FILECOUNT=`ls -ld www/* | wc -l`
+	echo -e "#define MFS_FILECOUNT\t$FILECOUNT" >include/mfs_filecount.h
+	cat include/mfs_filecount.h
+	
+	# Compile the source, link, output in firmware binarys
+	CMD='make -f makefiles/Makefile_'$MODEL''
+	sh -c "$CMD"
+	retval=$?
+	if [ $retval -ne 0 ]; then
+		echo
+    		echo "Error $retval running $CMD"
+    		exit 1
+	fi
+	if [ ! -d flashimages ]; then
+		mkdir flashimages
+	fi
+	if [ -s firmware ]; then
+		if [ -d flashimages/firmware_"$MODEL" ]; then
+			rm -rf flashimages/firmware_"$MODEL"
+		fi
+		mv firmware flashimages/firmware_"$MODEL"
+		echo "Created firmware_"$MODEL" "
+	fi
+
+	# Crate a memory filesystem file with the contents of ./www in it
+	./update_memoryfs 'flashimages/firmware_'$MODEL''
+	echo
+	echo
+}
+
+
+if [ "$MODEL" == "all" ]; then
+	echo -e "\nCompiling for all\n"
+	MODEL="h801"
+	domake
+	MODEL="spotlight_1ch"
+	domake
+	MODEL="dmx_5ch_ws2811"
+	domake
+	MODEL="sonoff_relay1"
+	domake
+	MODEL="sonoff_relay_dual"
+	domake
+	MODEL="sonoff_relay4"
+	domake
+	MODEL="sonoff_relay_th10"
+	domake
+	MODEL="pir"
+	domake
+	MODEL="t1_uk_1c"
+	domake
+	MODEL="t1_uk_2c"
+	domake
+	MODEL="t1_uk_3c"
+	domake
+	MODEL="doorbell"
+	domake
+	MODEL="max7219clock"
+	domake
+	MODEL="max7219clockb"
+	domake
+	MODEL="max7219_4line_display"
+	domake
+	MODEL="oled_tempsens"
+	domake
+	MODEL="relay_opto_board"
+	domake
+	echo
+	echo "Built all OK"
+	exit 
+fi
+
+domake
+

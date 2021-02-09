@@ -1,0 +1,1673 @@
+This is xforms.info, produced by makeinfo version 6.7 from xforms.texi.
+
+INFO-DIR-SECTION Development
+START-INFO-DIR-ENTRY
+* XForms: (xforms). A Graphical user interface toolkit for X
+END-INFO-DIR-ENTRY
+
+
+Indirect:
+xforms.info-1: 204
+xforms.info-2: 301578
+xforms.info-3: 606707
+xforms.info-4: 900646
+
+Tag Table:
+(Indirect)
+Node: Top204
+Node: Preface3157
+Node: Part I17313
+Node: Part I Introduction17633
+Ref: Part I Introduction-Footnote-121979
+Node: Part I Getting Started22085
+Node: Naming Conventions22587
+Node: Some Examples23788
+Node: Programming Model33245
+Node: Part I Defining Forms34859
+Node: Starting and Ending a Form Definition35916
+Node: Boxes37281
+Node: Texts40865
+Node: Buttons42365
+Node: Sliders47704
+Node: ValSliders49045
+Node: Input Fields49672
+Node: Grouping Objects52471
+Node: Hiding and Showing54628
+Node: Deactivating and Triggering Objects55704
+Node: Changing Attributes57283
+Node: Color57726
+Ref: FL_BLACK59688
+Ref: FL_WHITE59826
+Ref: FL_COL159917
+Ref: FL_BOTTOM_BCOL60007
+Ref: FL_RIGHT_BCOL60104
+Ref: FL_MCOL60200
+Ref: FL_LEFT_BCOL60290
+Ref: FL_LIGHTER_COL160385
+Ref: FL_DARKER_COL160483
+Ref: FL_SLATEBLUE60580
+Ref: FL_INDIANRED60675
+Ref: FL_RED60771
+Ref: FL_BLUE60860
+Ref: FL_GREEN60950
+Ref: FL_YELLOW61041
+Ref: FL_MAGENTA61133
+Ref: FL_CYAN61226
+Ref: FL_TOMATO61316
+Ref: FL_INACTIVE61408
+Ref: FL_TOP_BCOL61502
+Ref: FL_PALEGREEN61596
+Ref: FL_DARKGOLD61691
+Ref: FL_ORCHID61785
+Ref: FL_DARKCYAN61877
+Ref: FL_DARKTOMATO61971
+Ref: FL_WHEAT62067
+Ref: FL_DARKORANGE62158
+Ref: FL_DEEPPINK62254
+Ref: FL_CHARTREUSE62348
+Ref: FL_DARKVIOLET62443
+Ref: FL_SPRINGGREEN62539
+Ref: FL_DODGERBLUE62636
+Ref: FL_FREE_COL162732
+Ref: FL_MAX_COLORS63526
+Ref: fl_set_color_leak()66489
+Ref: Color-Footnote-167037
+Node: Bounding Boxes67142
+Node: Label Attributes and Fonts69838
+Ref: FL_TINY_SIZE70745
+Ref: FL_SMALL_SIZE70771
+Ref: FL_NORMAL_SIZE70799
+Ref: FL_MEDIUM_SIZE70827
+Ref: FL_LARGE_SIZE70855
+Ref: FL_HUGE_SIZE70883
+Ref: FL_NORMAL_STYLE71239
+Ref: FL_BOLD_STYLE71287
+Ref: FL_ITALIC_STYLE71338
+Ref: FL_BOLDITALIC_STYLE71386
+Ref: FL_FIXED_STYLE71434
+Ref: FL_FIXEDBOLD_STYLE71501
+Ref: FL_FIXEDITALIC_STYLE71539
+Ref: FL_FIXEDBOLDITALIC_STYLE71577
+Ref: FL_TIMES_STYLE71615
+Ref: FL_TIMESBOLD_STYLE FL71674
+Ref: FL_TIMESITALIC_STYLE71712
+Ref: FL_TIMESBOLDITALIC_STYLE71750
+Ref: FL_SHADOW_STYLE71788
+Ref: FL_ENGRAVED_STYLE71847
+Ref: FL_EMBOSSED_STYLE71912
+Ref: fl_get_font_name()74609
+Ref: fl_enumerate_fonts()75343
+Ref: FL_ALIGN_LEFT76380
+Ref: FL_ALIGN_RIGHT76426
+Ref: FL_ALIGN_TOP76474
+Ref: FL_ALIGN_BOTTOM76520
+Ref: FL_ALIGN_CENTER76569
+Ref: FL_ALIGN_RIGHT_BOTTOM76618
+Ref: FL_ALIGN_LEFT_BOTTOM76677
+Ref: FL_ALIGN_RIGHT_TOP76735
+Ref: FL_ALIGN_LEFT_TOP76791
+Ref: fl_to_inside_lalign()77045
+Ref: FL_ALIGN_INSIDE77327
+Ref: fl_to_outside_lalign()77433
+Ref: fl_is_inside_lalign()77917
+Ref: fl_is_outside_lalign()77917
+Ref: fl_is_center_lalign()77917
+Node: Tool Tips79675
+Node: Redrawing81558
+Node: Changing Many Attributes82499
+Node: Symbols83925
+Ref: fl_draw_symbol()87754
+Ref: fl_add_symbol()88280
+Ref: fl_delete_symbol()89769
+Ref: Symbols-Footnote-189895
+Node: Adding and Removing Objects90017
+Node: Freeing Objects91926
+Node: Part I Doing Interaction92682
+Node: Displaying a Form93045
+Ref: fl_update_display()94224
+Ref: FL_PLACE_SIZE94949
+Ref: FL_PLACE_POSITION95100
+Ref: FL_PLACE_GEOMETRY95246
+Ref: FL_PLACE_ASPECT95476
+Ref: FL_PLACE_MOUSE95606
+Ref: FL_PLACE_CENTER95844
+Ref: FL_PLACE_FULLSCREEN96010
+Ref: FL_PLACE_FREE96177
+Ref: FL_PLACE_HOTSPOT96467
+Ref: FL_PLACE_CENTERFREE96647
+Ref: FL_PLACE_ICONIC96805
+Ref: FL_FREE_SIZE97136
+Ref: fl_set_form_hotspot()98872
+Ref: fl_set_form_hotobject()98872
+Ref: FL_FULLBORDER99406
+Ref: FL_TRANSIENT99453
+Ref: FL_NOBORDER99516
+Ref: FL_RESIZE_NONE102818
+Ref: FL_RESIZE_X102872
+Ref: FL_RESIZE_Y102936
+Ref: FL_RESIZE_ALL102998
+Ref: FL_NoGravity103588
+Ref: FL_NorthWest103814
+Ref: FL_North103952
+Ref: FL_NorthEast104083
+Ref: FL_West104221
+Ref: FL_East104352
+Ref: FL_SouthWest104483
+Ref: FL_South104621
+Ref: FL_SouthEast104752
+Ref: ForgetGravity104890
+Ref: fl_for_all_objects()106377
+Ref: FL_INVISIBLE108126
+Ref: FL_VISIBLE108179
+Ref: FL_BEING_HIDDEN108229
+Ref: fl_set_atclose()108973
+Ref: fl_set_form_atclose()109508
+Ref: Displaying a Form-Footnote-1109911
+Ref: Displaying a Form-Footnote-2110095
+Ref: Displaying a Form-Footnote-3110202
+Node: Simple Interaction110336
+Ref: fl_set_object_return()113749
+Ref: fl_get_object_return()113749
+Ref: FL_RETURN_CHANGED114186
+Ref: FL_RETURN_END114379
+Ref: FL_RETURN_END_CHANGED114573
+Ref: FL_RETURN_SELECTION114703
+Ref: FL_RETURN_DESELECTION114815
+Ref: FL_RETURN_ALWAYS114931
+Ref: FL_RETURN_NONE115041
+Ref: fl_get_object_return_state()116377
+Node: Periodic Events and Non-blocking Interaction117024
+Ref: FL_APPEVENT_CB118527
+Ref: Periodic Events and Non-blocking Interaction-Footnote-1123293
+Ref: Periodic Events and Non-blocking Interaction-Footnote-2123342
+Node: Dealing With Multiple Windows123487
+Ref: fl_XNextEvent()127052
+Ref: fl_XPeekEvent()127052
+Ref: fl_XEventsQueued()127052
+Ref: fl_XPutbackEvent()127052
+Ref: fl_mouse_button()129440
+Ref: fl_print_xevent_name()131800
+Node: Using Callback Functions132096
+Ref: fl_addto_selected_xevent()139322
+Ref: fl_remove_selected_xevent()139322
+Node: Handling Other Input Sources142485
+Ref: fl_add_io_callback()143032
+Ref: fl_remove_io_callback()144142
+Node: Part I Free Objects144475
+Node: Free Object145378
+Ref: fl_add_free()145537
+Ref: Free Object-Footnote-1153359
+Node: Example153477
+Ref: Example-Footnote-1174173
+Node: Part I Goodies174279
+Node: Messages and Questions174674
+Ref: fl_show_message()174912
+Ref: fl_show_messages()175201
+Ref: fl_show_messages_f()175415
+Ref: fl_hide_message()176265
+Ref: fl_show_oneliner()176408
+Ref: fl_hide_oneliner()176408
+Ref: fl_set_oneliner_color()176911
+Ref: fl_set_oneliner_font()177043
+Ref: fl_show_alert()177098
+Ref: fl_hide_alert()177098
+Ref: fl_show_alert_f()177530
+Ref: fl_show_question()179004
+Ref: fl_hide_question()179004
+Ref: fl_show_choice()180564
+Ref: fl_show_choices()180564
+Ref: fl_set_choices_shortcut()180564
+Ref: fl_hide_choice()180564
+Ref: fl_set_goodies_font()181900
+Ref: fl_show_input()182014
+Ref: fl_hide_input()182014
+Ref: fl_show_simple_input()183063
+Node: Command Log184344
+Ref: fl_exe_command()184904
+Ref: fl_end_command()186484
+Ref: fl_end_all_command()186885
+Ref: fl_check_command()187055
+Ref: fl_popen()187551
+Ref: fl_pclose()187551
+Ref: fl_show_command_log()188001
+Ref: fl_hide_command_log()188001
+Ref: fl_set_command_log_position()188386
+Ref: fl_clear_command_log()188697
+Ref: fl_addto_command_log()188822
+Ref: fl_addto_command_log_f()188822
+Ref: fl_get_command_log_fdstruct()189339
+Node: Colormap189887
+Ref: fl_show_colormap()190413
+Node: Color Chooser190681
+Ref: fl_show_color_chooser()191211
+Node: File Selector192006
+Ref: fl_show_fselector()192281
+Ref: fl_hide_fselector()193876
+Ref: fl_use_fselector()194290
+Ref: fl_set_fselector_fontsize()194463
+Ref: fl_set_fselector_fontstyle()194463
+Ref: fl_set_fselector_title()194864
+Ref: fl_invalidate_fselector_cache()194960
+Ref: fl_disable_fselector_cache()195205
+Ref: fl_set_fselector_callback()196236
+Ref: fl_set_fselector_placement()196885
+Ref: fl_set_fselector_border()197176
+Ref: fl_get_directory()197783
+Ref: fl_get_pattern()197783
+Ref: fl_get_filename()197783
+Ref: fl_set_directory()198019
+Ref: fl_set_pattern()198019
+Ref: fl_add_fselector_appbutton()198424
+Ref: fl_remove_fselector_appbutton()198798
+Ref: fl_refresh_fselector()198976
+Ref: fl_get_fselector_form()199223
+Ref: fl_get_fselector_fdstruct()199483
+Ref: fl_set_fselector_filetype_marker()200641
+Ref: fl_get_dirlist()201609
+Ref: fl_free_dirlist()203313
+Ref: fl_set_dirlist_filter()204417
+Ref: fl_set_dirlist_filterdir()204725
+Ref: fl_set_dirlist_sort()205060
+Node: Part II206166
+Node: Part II Introduction206551
+Node: Part II Getting Started209226
+Node: Part II Command Line Arguments215563
+Node: Part II Creating Forms220978
+Node: Creating and Changing Forms221484
+Node: Adding Objects222518
+Node: Selecting Objects223159
+Node: Moving and Scaling224729
+Node: Aligning Objects225957
+Node: Raising and Lowering227755
+Node: Setting Attributes229488
+Node: Generic Attributes231096
+Node: Basic Attributes231866
+Node: Font233728
+Node: Misc. Attributes234193
+Node: Colors235535
+Node: Object Specific Attributes236860
+Node: Copy and Paste238949
+Node: Groups240362
+Node: Hiding and Showing Objects242661
+Node: Testing Forms243594
+Node: Part II Saving and Loading Forms244661
+Ref: Part II Saving and Loading Forms-Footnote-1254856
+Node: Part II Language Filters255012
+Node: External Filters256528
+Node: Command Line Arguments of the Filter257901
+Node: Part II Generating Hardcopies258587
+Node: Part III263443
+Node: Part III Introduction263908
+Node: Part III Static Objects268963
+Node: Box Object269432
+Node: Adding Box Objects269878
+Ref: fl_add_box()270056
+Node: Box Types270292
+Ref: FL_UP_BOX270468
+Ref: FL_DOWN_BOX270522
+Ref: FL_FLAT_BOX270580
+Ref: FL_BORDER_BOX270629
+Ref: FL_FRAME_BOX270682
+Ref: FL_SHADOW_BOX270738
+Ref: FL_ROUNDED_BOX270786
+Ref: FL_RFLAT_BOX270824
+Ref: FL_RSHADOW_BOX270877
+Ref: FL_OVAL_BOX270929
+Ref: FL_NO_BOX270966
+Node: Box Attributes271022
+Node: Box Remarks271300
+Node: Frame Object271544
+Node: Adding Frame Objects272514
+Ref: fl_add_frame()272704
+Node: Frame Types273088
+Node: Frame Attributes273677
+Node: Frame Remarks274041
+Node: LabelFrame Object274335
+Node: Adding LabelFrame Objects274894
+Ref: fl_add_labelframe()275114
+Node: LabelFrame Types275674
+Node: LabelFrame Attributes276293
+Node: LabelFrames Remarks276689
+Node: Text Object277028
+Node: Adding Text Objects277418
+Ref: fl_add_text()277602
+Node: Text Types277847
+Node: Text Attributes278043
+Node: Text Remarks278684
+Node: Bitmap Object279520
+Node: Adding Bitmap Objects280001
+Ref: fl_add_bitmap()280197
+Node: Bitmap Types280464
+Node: Bitmap Interaction280672
+Node: Other Bitmap Routines281125
+Ref: fl_set_bitmap_data()281352
+Ref: fl_set_bitmap_file()281352
+Ref: fl_read_bitmapfile()281865
+Ref: fl_create_from_bitmapdata()281865
+Node: Bitmap Attributes282490
+Node: Bitmap Remarks283003
+Node: Pixmap Object283164
+Node: Adding Pixmap Objects283659
+Ref: fl_add_pixmap()283851
+Node: Pixmap Types284117
+Node: Pixmap Interaction284325
+Node: Other Pixmap Routines284778
+Ref: fl_set_pixmap_file()285231
+Ref: fl_set_pixmap_data()285231
+Ref: fl_free_pixmap_pixmap()285759
+Ref: fl_get_pixmap_pixmap()286060
+Ref: fl_set_pixmap_pixmap()286383
+Ref: fl_set_pixmap_align()286991
+Node: Pixmap Attributes287422
+Ref: fl_set_pixmap_colorcloseness()288056
+Node: Pixmap Remarks288128
+Ref: fl_read_pixmapfile()288324
+Ref: fl_create_from_pixmapdata()289128
+Ref: fl_free_pixmap()289834
+Node: Clock Object290239
+Node: Adding Clock Objects290712
+Ref: fl_add_clock()290902
+Node: Clock Types291126
+Node: Clock Interaction291427
+Node: Other Clock Routines291634
+Ref: fl_get_clock()291921
+Ref: fl_set_clock_adjustment()292249
+Ref: fl_set_clock_ampm()292625
+Node: Clock Attributes292683
+Node: Clock Remarks293062
+Node: Chart Object293293
+Node: Adding Chart Objects294156
+Ref: fl_add_chart()294349
+Node: Chart Types294548
+Node: Chart Interaction295486
+Node: Other Chart Routines295693
+Ref: fl_clear_chart()295996
+Ref: fl_add_chart_value()296069
+Ref: fl_set_chart_lstyle()296742
+Ref: fl_set_chart_lsize()296742
+Ref: fl_set_chart_lcolor()296742
+Ref: fl_insert_chart_value()297111
+Ref: fl_replace_chart_value()297562
+Ref: fl_set_chart_bounds()298092
+Ref: fl_get_chart_bounds()298305
+Ref: fl_set_chart_autosize()298495
+Ref: fl_set_chart_maxnumb()298767
+Node: Chart Attributes298939
+Ref: fl_set_chart_baseline()299282
+Node: Chart Remarks299505
+Node: Part III Button-like Objects299702
+Node: Adding Button Objects301578
+Ref: fl_add_button()301806
+Ref: fl_add_lightbutton()301806
+Ref: fl_add_roundbutton()301806
+Ref: fl_add_round3dbutton()301806
+Ref: fl_add_checkbutton()301806
+Ref: fl_add_bitmapbutton()301806
+Ref: fl_add_pixmapbutton()301806
+Ref: fl_add_labelbutton()301806
+Ref: fl_add_scrollbutton()301806
+Ref: FL_BUTTON303513
+Ref: FL_LIGHTBUTTON303557
+Ref: FL_ROUNDBUTTON303685
+Ref: FL_ROUND3DBUTTON303857
+Ref: FL_CHECKBUTTON303966
+Ref: FL_BITMAPBUTTON304150
+Ref: FL_PIXMAPBUTTON304295
+Ref: FL_LABELBUTTON304535
+Ref: FL_SCROLLBARBUTTON304668
+Node: Button Types305229
+Ref: FL_NORMAL_BUTTON305446
+Ref: FL_PUSH_BUTTON305568
+Ref: FL_MENU_BUTTON305632
+Ref: FL_TOUCH_BUTTON305723
+Ref: FL_RADIO_BUTTON305808
+Ref: FL_HIDDEN_BUTTON305883
+Ref: FL_INOUT_BUTTON305933
+Ref: FL_RETURN_BUTTON306002
+Ref: FL_HIDDEN_RET_BUTTON306087
+Node: Button Interaction307617
+Node: Other Button Routines309850
+Ref: fl_set_button()310168
+Ref: fl_get_button()310896
+Ref: fl_get_button_numb()311134
+Ref: fl_set_button_mouse_buttons()311970
+Ref: fl_get_button_mouse_buttons()312351
+Ref: fl_set_button_shortcut()312814
+Ref: fl_set_bitmapbutton_data()314709
+Ref: fl_set_bitmapbutton_file()314709
+Ref: fl_set_pixmapbutton_data()314998
+Ref: fl_set_pixmapbutton_file()314998
+Ref: fl_set_pixmapbutton_pixmap()314998
+Ref: fl_free_pixmapbutton_pixmap()315745
+Ref: fl_get_pixmapbutton_pixmap()315978
+Ref: fl_set_pixmapbutton_align()316228
+Ref: fl_set_pixmapbutton_focus_data()316860
+Ref: fl_set_pixmapbutton_focus_file()316860
+Ref: fl_set_pixmapbutton_focus_pixmap()316860
+Ref: fl_set_pixmapbutton_focus_outline()317395
+Ref: fl_free_pixmap_focus_pixmap()317610
+Ref: Other Button Routines-Footnote-1317703
+Node: Button Attributes317757
+Node: Button Remarks319217
+Node: Part III Valuator Objects319444
+Node: Slider Object319891
+Node: Adding Slider Objects320673
+Ref: fl_add_slider()320870
+Ref: fl_add_valslider()321011
+Node: Slider Types321393
+Ref: FL_VERT_SLIDER321599
+Ref: FL_HOR_SLIDER321641
+Ref: FL_VERT_FILL_SLIDER321684
+Ref: FL_HOR_FILL_SLIDER321755
+Ref: FL_VERT_NICE_SLIDER321825
+Ref: FL_HOR_NICE_SLIDER321885
+Ref: FL_VERT_BROWSER_SLIDER321946
+Ref: FL_HOR_BROWSER_SLIDER322014
+Ref: FL_VERT_PROGRESS_BAR322083
+Ref: FL_HOR_PROGRESS_BAR322136
+Node: Slider Interaction322454
+Node: Other Slider Routines324607
+Ref: fl_set_slider_value()324859
+Ref: fl_set_slider_bounds()324859
+Ref: fl_get_slider_value()325709
+Ref: fl_get_slider_bounds()325709
+Ref: fl_set_slider_mouse_buttons()325958
+Ref: fl_get_slider_mouse_buttons()326246
+Node: Slider Attributes326478
+Ref: fl_set_slider_size()327090
+Ref: fl_get_slider_size()327551
+Ref: fl_set_slider_precision()327612
+Ref: fl_set_slider_filter()328067
+Node: Slider Remarks328684
+Node: Scrollbar Object328999
+Node: Adding Scrollbar Objects330001
+Ref: fl_add_scrollbar()330199
+Node: Scrollbar Types330503
+Ref: FL_VERT_SCROLLBAR330729
+Ref: FL_HOR_SCROLLBAR330777
+Ref: FL_VERT_THIN_SCROLLBAR330826
+Ref: FL_HOR_THIN_SCROLLBAR330897
+Ref: FL_VERT_NICE_SCROLLBAR330969
+Ref: FL_HOR_NICE_SCROLLBAR331045
+Ref: FL_VERT_PLAIN_SCROLLBAR331122
+Ref: FL_HOR_PLAIN_SCROLLBAR331186
+Node: Scrollbar Interaction331253
+Node: Other Scrollbar Routines333299
+Ref: fl_set_scrollbar_value()333573
+Ref: fl_set_scrollbar_bounds()333573
+Ref: fl_get_scrollbar_value()334448
+Ref: fl_get_scrollbar_bounds()334448
+Ref: fl_set_scrollbar_increment()334787
+Ref: fl_get_scrollbar_increment()335393
+Ref: fl_get_scrollbar_repeat()335490
+Ref: fl_set_scrollbar_repeat()335490
+Node: Scrollbar Attributes335990
+Ref: fl_set_scrollbar_size()336649
+Ref: fl_get_scrollbar_size()337012
+Node: Scrollbar Remarks337116
+Node: Dial Object337323
+Node: Adding Dial Objects338052
+Ref: fl_add_dial()338220
+Node: Dial Types338447
+Ref: FL_NORMAL_DIAL338699
+Ref: FL_LINE_DIAL338766
+Ref: FL_FILL_DIAL338831
+Node: Dial Interaction338900
+Node: Other Dial Routines339891
+Ref: fl_set_dial_value()340112
+Ref: fl_set_dial_bounds()340112
+Ref: fl_get_dial_value()340379
+Ref: fl_get_dial_bounds()340379
+Ref: fl_set_dial_angles()340683
+Ref: fl_get_dial_angles()341061
+Ref: fl_set_dial_crossover()341264
+Ref: fl_set_dial_step()341533
+Ref: fl_get_dial_step()341768
+Ref: fl_set_dial_direction()341911
+Ref: fl_get_dial_direction()342055
+Node: Dial Attributes342105
+Node: Dial Remarks342700
+Node: Positioner Object343183
+Node: Adding Positioner Objects343990
+Ref: fl_add_positioner()344211
+Node: Positioner Types344449
+Ref: FL_NORMAL_POSITIONER344674
+Ref: FL_OVERLAY_POSITIONER344728
+Ref: FL_INVISIBLE_POSITIONER344795
+Node: Positioner Interaction345258
+Ref: fl_set_positioner_mouse_buttons()346604
+Ref: fl_get_positioner_mouse_buttons()346979
+Ref: fl_get_positioner_numb()347391
+Node: Other Positioner Routines347670
+Ref: fl_reset_positioner348235
+Ref: fl_set_positioner_xbounds()348540
+Ref: fl_set_positioner_ybounds()348540
+Ref: FL_POSITIONER_VALIDATOR349388
+Ref: fl_set_positioner_validator()349388
+Ref: FL_POSITIONER_INVALID349820
+Ref: FL_POSITIONER_VALID349961
+Ref: FL_POSITIONER_REPLACED350118
+Ref: fl_set_positioner_values()351072
+Ref: fl_set_positioner_xvalue()351072
+Ref: fl_set_positioner_yvalue()351072
+Ref: fl_get_positioner_xvalue()351744
+Ref: fl_get_positioner_yvalue()351744
+Ref: fl_get_positioner_xbounds()351744
+Ref: fl_get_positioner_ybounds()351744
+Ref: fl_set_positioner_xstep()352155
+Ref: fl_set_positioner_ystep()352155
+Ref: fl_get_positioner_xstep()352427
+Ref: fl_get_positioner_ystep()352427
+Node: Positioner Attributes353289
+Node: Positioners Remarks353797
+Node: Counter Object353971
+Node: Adding Counter Objects354916
+Ref: fl_add_counter()355102
+Node: Counter Types355337
+Ref: FL_NORMAL_COUNTER355611
+Ref: FL_SIMPLE_COUNTER355678
+Node: Counter Interaction355744
+Node: Other Counter Routines357062
+Ref: fl_set_counter_value()357328
+Ref: fl_set_counter_bounds()357328
+Ref: fl_set_counter_step()357328
+Ref: fl_get_counter_value()358244
+Ref: fl_get_counter_bounds()358363
+Ref: fl_get_counter_step()358363
+Ref: fl_set_counter_precision()358628
+Ref: fl_get_counter_precision()358743
+Ref: fl_set_counter_filter()358961
+Ref: fl_set_counter_repeat()359866
+Ref: fl_set_counter_min_repeat()359958
+Ref: fl_get_counter_repeat()360195
+Ref: fl_get_counter_min_repeat()360195
+Ref: fl_set_counter_speedjump()360674
+Ref: fl_get_counter_speedjump()361022
+Node: Counter Attributes361075
+Node: Counter Remarks361499
+Node: Spinner Object361692
+Node: Adding Spinner Objects362667
+Ref: fl_add_spinner()362853
+Node: Spinner Types363105
+Ref: FL_INT_SPINNER363364
+Ref: FL_FLOAT_SPINNER363434
+Node: Spinner Interaction363906
+Node: Other Spinner Routines365422
+Ref: fl_get_spinner_value()365661
+Ref: fl_set_spinner_value()365661
+Ref: fl_set_spinner_bounds()366162
+Ref: fl_get_spinner_bounds()366162
+Ref: fl_set_spinner_step()366801
+Ref: fl_get_spinner_step()366801
+Ref: fl_set_spinner_precision()367139
+Ref: fl_get_spinner_precision()367139
+Node: Spinner Attributes367460
+Ref: fl_get_spinner_input()368331
+Ref: fl_get_spinner_up_button()368331
+Ref: fl_get_spinner_down_button()368331
+Node: Thumbwheel Object368906
+Node: Adding Thumbwheel Objects369691
+Ref: fl_add_thumbwheel()369895
+Node: Thumbwheel Types370140
+Ref: FL_VERT_THUMBWHEEL370437
+Ref: FL_HOR_THUMBWHEEL370487
+Node: Thumbwheel Interaction370538
+Node: Other Thumbwheel Routines372609
+Ref: fl_set_thumbwheel_value()372889
+Ref: fl_set_thumbwheel_bounds()372889
+Ref: fl_get_thumbwheel_value()373168
+Ref: fl_get_thumbwheel_bounds()373168
+Ref: fl_set_thumbwheel_crossover()373620
+Ref: fl_set_thumbwheel_step()373830
+Ref: fl_get_thumbwheel_step()374061
+Node: Thumbwheel Attributes374115
+Node: Thumbwheel Remarks374392
+Node: Part III Input Objects374604
+Node: Adding Input Objects375280
+Ref: fl_add_input()375500
+Node: Input Types375741
+Ref: FL_NORMAL_INPUT375944
+Ref: FL_FLOAT_INPUT376015
+Ref: FL_INT_INPUT376242
+Ref: FL_DATE_INPUT376454
+Ref: FL_MULTILINE_INPUT376576
+Ref: FL_SECRET_INPUT376647
+Ref: FL_HIDDEN_INPUT376789
+Node: Input Interaction377606
+Ref: fl_input_end_return_handling()383371
+Ref: FL_INPUT_END_EVENT_ALWAYS383443
+Ref: FL_INPUT_END_EVENT_CLASSIC383501
+Ref: fl_set_input_maxchars()383887
+Ref: FL_INPUT_VALIDATOR384401
+Ref: fl_set_input_filter()384401
+Ref: FL_VALID384669
+Ref: FL_INVALID384669
+Ref: FL_RINGBELL384669
+Ref: fl_set_input_format()386258
+Ref: fl_get_input_format()386258
+Ref: fl_validate_input()387182
+Ref: fl_set_input_mode()388435
+Ref: FL_NORMAL_INPUT_MODE388459
+Ref: FL_DOS_INPUT_MODE388544
+Node: Other Input Routines389007
+Ref: fl_set_input()389320
+Ref: fl_set_input_f()389320
+Ref: fl_get_input()390321
+Ref: fl_set_input_selected()390911
+Ref: fl_set_input_selected_range()390911
+Ref: fl_get_input_selected_range()391679
+Ref: fl_get_input_cursorpos()392562
+Ref: fl_set_input_cursorpos()393274
+Ref: fl_set_input_hscrollbar()393872
+Ref: fl_set_input_vscrollbar()393872
+Ref: fl_set_input_scroll()394496
+Ref: fl_set_input_topline()394718
+Ref: fl_set_input_xoffset()394914
+Ref: fl_get_input_xoffset()395159
+Ref: fl_set_input_cursor_visible()395325
+Ref: fl_get_input_numberoflines()395448
+Ref: fl_get_input_topline()395556
+Ref: fl_get_input_screenlines()395669
+Ref: fl_set_input_fieldchar()395873
+Node: Input Attributes395981
+Ref: fl_set_input_color()396438
+Ref: fl_get_input_color()396656
+Ref: fl_set_input_scrollbarsize()396882
+Ref: fl_get_input_scrollbarsize()397158
+Ref: FL_EditKeymap397975
+Ref: fl_set_input_editkeymap()399474
+Ref: fl_get_input_editkeymap()400164
+Ref: FL_CONTROL_MASK400694
+Ref: FL_ALT_MASK400752
+Node: Input Remarks401860
+Node: Part III Choice Objects402356
+Node: Select Object402631
+Node: Adding Select Objects403441
+Ref: fl_add_select()403634
+Ref: FL_NORMAL_SELECT403844
+Ref: FL_MENU_SELECT404065
+Ref: FL_DROPLIST_SELECT404290
+Ref: fl_add_select_items()404680
+Ref: fl_set_select_items()408354
+Ref: fl_set_select_popup()409585
+Node: Select Interaction409985
+Ref: fl_set_select_policy()413373
+Node: Other Select Routines413833
+Ref: fl_get_select_item()414064
+Ref: fl_get_select_item_by_value()414474
+Ref: fl_get_select_item_by_label()414474
+Ref: fl_get_select_item_by_label_f()414474
+Ref: fl_get_select_item_by_text()414474
+Ref: fl_get_select_item_by_text_f()414474
+Ref: fl_set_select_item()416257
+Ref: fl_delete_select_item()416427
+Ref: fl_replace_select_item()416667
+Ref: fl_insert_select_items()417652
+Ref: fl_clear_select()418221
+Node: Select Attributes418647
+Ref: fl_set_select_text_color()419031
+Ref: fl_get_select_text_color()419031
+Ref: fl_set_select_text_align()419380
+Ref: fl_get_select_text_align()419380
+Ref: fl_set_select_text_font()419800
+Ref: fl_get_select_text_font()419800
+Ref: fl_get_select_popup()420815
+Node: Select Remarks422172
+Node: Nmenu Object422371
+Node: Adding Nmenu Objects423045
+Ref: fl_add_nmenu()423222
+Ref: FL_NORMAL_NMENU423392
+Ref: FL_NORMAL_TOUCH_NMENU423533
+Ref: FL_BUTTON_NMENU423721
+Ref: FL_BUTTON_TOUCH_NMENU423893
+Ref: fl_add_nmenu_items()424194
+Ref: fl_set_nmenu_items()425235
+Ref: fl_set_nmenu_popup()428942
+Node: Nmenu Interaction429081
+Ref: fl_set_nmenu_policy()431666
+Node: Other Nmenu Routines432102
+Ref: fl_get_nmenu_item()432341
+Ref: fl_get_nmenu_item_by_value()432848
+Ref: fl_get_nmenu_item_by_label()432848
+Ref: fl_get_nmenu_item_by_text()432848
+Ref: fl_delete_nmenu_item()433955
+Ref: fl_replace_nmenu_item()434086
+Ref: fl_insert_nmenu_items()434480
+Ref: fl_add_nmenu_items2()435311
+Ref: fl_insert_nmenu_items2()435311
+Ref: fl_replace_nmenu_items2()435311
+Ref: fl_clear_nmenu()436567
+Node: Nmenu Attributes436609
+Ref: fl_set_nmenu_hl_text_color()437259
+Ref: fl_get_nmenu_popup()438070
+Node: Nmenu Remarks438367
+Node: Browser Object438517
+Node: Adding Browser Objects439564
+Ref: fl_add_browser()439762
+Node: Browser Types439994
+Ref: FL_NORMAL_BROWSER440243
+Ref: FL_SELECT_BROWSER440315
+Ref: FL_HOLD_BROWSER440474
+Ref: FL_DESELECTABLE_HOLD_BROWSER440589
+Ref: FL_MULTI_BROWSER440706
+Node: Browser Interaction440874
+Node: Other Browser Routines445093
+Ref: fl_clear_browser()445427
+Ref: fl_add_browser_line()445510
+Ref: fl_add_browser_line_f()445510
+Ref: fl_addto_browser()446091
+Ref: fl_addto_browser_f()446091
+Ref: fl_addto_browser_chars()446550
+Ref: fl_addto_browser_chars_f()446550
+Ref: fl_insert_browser_line()447427
+Ref: fl_insert_browser_line_f()447427
+Ref: fl_delete_browser_line()448395
+Ref: fl_replace_browser_line()448498
+Ref: fl_replace_browser_line_f()448498
+Ref: fl_get_browser_line()449949
+Ref: fl_load_browser()450185
+Ref: fl_select_browser_line()450739
+Ref: fl_deselect_browser()450739
+Ref: fl_deselect_browser_line()450739
+Ref: fl_isselected_browser_line()450998
+Ref: fl_get_browser_maxline()451074
+Ref: fl_get_browser_screenlines()451643
+Ref: fl_get_browser()451967
+Ref: fl_get_browser_topline()452350
+Ref: fl_show_browser_line()452545
+Ref: fl_set_browser_dblclick_callback()452813
+Ref: fl_set_browser_topline()453201
+Ref: fl_set_browser_bottomline()453201
+Ref: fl_set_browser_xoffset()453551
+Ref: fl_set_browser_rel_xoffset()453551
+Ref: fl_set_browser_yoffset()453551
+Ref: fl_set_browser_rel_yoffset()453551
+Ref: fl_get_browser_xoffset()454218
+Ref: fl_get_browser_rel_xoffset()454218
+Ref: fl_get_browser_yoffset()454218
+Ref: fl_get_browser_rel_yoffset()454218
+Ref: fl_get_browser_line_yoffset()454529
+Node: Browser Attributes454801
+Ref: fl_set_browser_fontsize()455303
+Ref: fl_set_browser_fontstyle()455415
+Ref: fl_set_browser_specialkey()457730
+Ref: fl_set_browser_hscrollbar()458004
+Ref: fl_set_browser_vscrollbar()458004
+Ref: fl_set_browser_hscroll_callback()458800
+Ref: fl_set_browser_vscroll_callback()458800
+Ref: fl_set_browser_scrollbarsize()460521
+Ref: fl_get_browser_dimension()461423
+Ref: fl_get_browser_scrollbar_repeat()461857
+Ref: fl_set_browser_scrollbar_repeat()461857
+Node: Browser Remarks462402
+Node: Part III Container Objects463075
+Node: Folder Object463342
+Node: Adding Folder Objects464071
+Ref: fl_add_tabfolder()464270
+Node: Folder Types464550
+Ref: FL_TOP_TABFOLDER464745
+Ref: FL_BOTTOM_TABFOLDER464798
+Node: Folder Interaction464861
+Ref: fl_get_active_folder()466566
+Ref: fl_get_active_folder_number()466566
+Ref: fl_get_active_folder_name()466566
+Ref: fl_get_folder()467292
+Ref: fl_get_folder_number()467292
+Ref: fl_get_folder_name()467292
+Node: Other Folder Routines467520
+Ref: fl_addto_tabfolder()467754
+Ref: fl_get_tabfolder_folder_bynumber()469301
+Ref: fl_get_tabfolder_folder_byname()469301
+Ref: fl_get_tabfolder_folder_byname_f()469301
+Ref: fl_get_tabfolder_offset()470428
+Ref: fl_set_tabfolder_offset()470428
+Ref: fl_get_tabfolder_numfolders()471494
+Ref: fl_delete_folder()471604
+Ref: fl_delete_folder_bynumber()471604
+Ref: fl_delete_folder_byname()471604
+Ref: fl_delete_folder_byname_f()471604
+Ref: fl_set_folder()472469
+Ref: fl_set_folder_bynumber()472469
+Ref: fl_set_folder_byname()472469
+Ref: fl_set_folder_byname_f()472469
+Ref: fl_get_folder_area()473150
+Ref: fl_set_tabfolder_autofit()473888
+Node: Folder Remarks474194
+Ref: fl_set_default_tabfolder_corner()474543
+Node: FormBrowser Object475799
+Node: Adding FormBrowser Objects476664
+Ref: fl_add_formbrowser()476910
+Node: FormBrowser Types477203
+Node: FormBrowser Interaction477476
+Node: Other FormBrowser Routines479103
+Ref: fl_addto_formbrowser()479365
+Ref: fl_get_formbrowser_numforms()480190
+Ref: fl_delete_formbrowser()480787
+Ref: fl_delete_formbrowser_bynumber()480787
+Ref: fl_replace_formbrowser()481659
+Ref: fl_insert_formbrowser()482155
+Ref: fl_find_formbrowser_form_number()482515
+Ref: fl_get_formbrowser_form()482775
+Ref: fl_set_formbrowser_hscrollbar()483007
+Ref: fl_set_formbrowser_vscrollbar()483007
+Ref: fl_set_formbrowser_scroll()483459
+Ref: FL_SMOOTH_SCROLL483561
+Ref: FL_JUMP_SCROLL483599
+Ref: fl_get_formbrowser_topform()483767
+Ref: fl_set_formbrowser_topform()483914
+Ref: fl_set_formbrowser_topform_bynumber()483914
+Ref: fl_get_formbrowser_area()484348
+Ref: fl_set_formbrowser_xoffset()484671
+Ref: fl_set_formbrowser_yoffset()484671
+Ref: fl_get_formbrowser_xoffset()485241
+Ref: fl_get_formbrowser_yoffset()485241
+Node: FormBrowser Remarks485349
+Node: Part III Other Objects485752
+Node: Timer Object486019
+Node: Adding Timer Objects487270
+Ref: fl_add_timer()487460
+Node: Timer Types487641
+Node: Timer Interaction488085
+Node: Other Timer Routines488850
+Ref: fl_set_timer()489069
+Ref: fl_get_timer()489261
+Ref: fl_set_timer_countup()489520
+Ref: fl_suspend_timer()489703
+Ref: fl_resume_timer()489771
+Ref: fl_set_timer_filter()490107
+Node: Timer Attributes490586
+Node: Timer Remarks490958
+Node: XYPlot Object491512
+Node: Adding XYPlot Objects492141
+Ref: fl_add_xyplot()492341
+Node: XYPlot Types492554
+Ref: FL_NORMAL_XYPLOT492749
+Ref: FL_SQUARE_XYPLOT492819
+Ref: FL_CIRCLE_XYPLOT492899
+Ref: FL_FILL_XYPLOT492979
+Ref: FL_POINTS_XYPLOT493066
+Ref: FL_LINEPOINTS_XYPLOT493125
+Ref: FL_DASHED_XYPLOT493220
+Ref: FL_DOTTED_XYPLOT493273
+Ref: FL_DOTDASHED_XYPLOT493326
+Ref: FL_IMPULSE_XYPLOT493389
+Ref: FL_ACTIVE_XYPLOT493444
+Ref: FL_EMPTY_XYPLOT493554
+Node: XYPlot Interaction493964
+Ref: fl_get_xyplot()495673
+Ref: fl_set_xyplot_mark_active()496037
+Ref: fl_set_xyplot_data()496187
+Ref: fl_set_xyplot_data_double()496187
+Ref: fl_set_xyplot_file()497247
+Ref: fl_get_xyplot_data_size()497857
+Ref: fl_get_xyplot_data()497857
+Ref: fl_set_xyplot_inspect()498317
+Node: Other XYPlot Routines499041
+Ref: fl_set_xyplot_xtics()499371
+Ref: fl_set_xyplot_ytics()499371
+Ref: fl_set_xyplot_log_minor_xtics()500271
+Ref: fl_set_xyplot_log_minor_ytics()500271
+Ref: fl_set_xyplot_alphaxtics()500803
+Ref: fl_set_xyplot_alphaytics()500803
+Ref: fl_set_xyplot_xgrid()502201
+Ref: fl_set_xyplot_ygrid()502201
+Ref: fl_set_xyplot_grid_linestyle()502617
+Ref: fl_set_xyplot_fixed_xaxis()503107
+Ref: fl_set_xyplot_fixed_yaxis()503107
+Ref: fl_set_xyplot_symbolsize()503908
+Ref: fl_set_xyplot_symbol()504178
+Ref: fl_set_xyplot_xbounds()505841
+Ref: fl_set_xyplot_ybounds()505841
+Ref: fl_get_xyplot_xbounds()506297
+Ref: fl_get_xyplot_ybounds()506297
+Ref: fl_replace_xyplot_point()506503
+Ref: fl_add_xyplot_overlay()506771
+Ref: fl_add_xyplot_overlay_file()507242
+Ref: fl_set_xyplot_overlay_type()507581
+Ref: fl_get_xyplot_overlay_data()507898
+Ref: fl_get_xyplot_data_pointer()508544
+Ref: fl_set_xyplot_maxoverlays()509005
+Ref: fl_get_xyplot_numdata()509307
+Ref: fl_insert_xyplot_data()509487
+Ref: fl_delete_xyplot_overlay()509945
+Ref: fl_add_xyplot_text()510209
+Ref: fl_delete_xyplot_text()510950
+Ref: fl_set_xyplot_key()511358
+Ref: fl_set_xyplot_key_position()511597
+Ref: fl_set_xyplot_keys()511964
+Ref: fl_set_xyplot_key_font()512398
+Ref: fl_set_xyplot_interpolate()512536
+Ref: fl_set_xyplot_linewidth()513032
+Ref: fl_set_xyplot_xscale()513355
+Ref: fl_set_xyplot_yscale()513355
+Ref: fl_clear_xyplot()513713
+Ref: fl_get_xyplot_xmapping()514160
+Ref: fl_get_xyplot_ymapping()514160
+Ref: fl_xyplot_s2w()514725
+Ref: fl_xyplot_w2s()514725
+Ref: fl_get_xyplot_screen_area()515220
+Ref: fl_get_xyplot_world_area()515220
+Ref: fl_set_xyplot_mouse_buttons()516008
+Ref: fl_get_xyplot_mouse_buttons()516304
+Node: XYPlot Attributes516536
+Node: XYPlot Remarks517095
+Ref: fl_interpolate()517294
+Node: Canvas Object518145
+Node: Adding Canvas Objects519704
+Ref: fl_add_canvas()519917
+Node: Canvas Types520300
+Node: Canvas Interaction520531
+Ref: fl_add_canvas_handler()521538
+Ref: fl_remove_canvas_handler()524245
+Ref: fl_get_canvas_id()524739
+Ref: FL_ObjWin()524835
+Node: Other Canvas Routines525957
+Ref: fl_set_canvas_attributes()526386
+Ref: fl_set_canvas_colormap()526745
+Ref: fl_get_canvas_colormap()526745
+Ref: fl_set_canvas_visual()526745
+Ref: fl_set_canvas_depth()526745
+Ref: fl_get_canvas_depth()526745
+Ref: fl_share_canvas_colormap()527904
+Ref: fl_create_colormap()528639
+Ref: fl_canvas_yield_to_shortcut()529657
+Ref: fl_clear_canvas()529749
+Node: Canvas Attributes529979
+Node: OpenGL Canvas530474
+Ref: fl_add_glcanvas()530895
+Ref: fl_set_glcanvas_defaults()531398
+Ref: fl_get_glcanvas_defaults()531546
+Ref: fl_set_glcanvas_attributes()531709
+Ref: fl_get_glcanvas_attributes()531990
+Ref: fl_get_glcanvas_context()532181
+Ref: fl_set_glcanvas_direct()532454
+Ref: fl_activate_glcanvas()533027
+Ref: fl_get_glcanvas_xvisualinfo()533228
+Node: Part III Popups533351
+Node: Adding Popups534696
+Ref: fl_popup_add()535279
+Ref: fl_popup_add_entries()536057
+Ref: FL_POPUP_CB544215
+Ref: FL_POPUP_RETURN545651
+Ref: FL_POPUP_ENTRY548609
+Ref: FL_POPUP_NORMAL549412
+Ref: FL_POPUP_TOGGLE549480
+Ref: FL_POPUP_RADIO549589
+Ref: FL_POPUP_SUB549798
+Ref: FL_POPUP_LINE549988
+Ref: FL_POPUP_NONE550188
+Ref: FL_POPUP_DISABLED550260
+Ref: FL_POPUP_HIDDEN550387
+Ref: FL_POPUP_CHECKED550470
+Ref: fl_popup_entry_delete()552569
+Ref: fl_popup_create()554130
+Ref: FL_POPUP_ITEM554530
+Ref: fl_popup_add_items()561359
+Ref: fl_popup_insert_items()561359
+Node: Popup Interaction562247
+Ref: fl_popup_do()562467
+Ref: fl_popup_set_policy()566173
+Ref: FL_POPUP_NORMAL_SELECT566273
+Ref: FL_POPUP_DRAG_SELECT566432
+Ref: fl_popup_get_policy()566868
+Node: Other Popup Routines567691
+Ref: fl_popup_set_position()568041
+Ref: fl_popup_get_size()568627
+Ref: fl_popup_set_callback()569159
+Ref: fl_popup_entry_set_callback()569520
+Ref: fl_popup_entry_set_enter_callback()569520
+Ref: fl_popup_entry_set_leave_callback()569520
+Ref: fl_popup_entry_set_state()570783
+Ref: fl_popup_entry_get_state()570783
+Ref: fl_popup_entry_clear_state()571710
+Ref: fl_popup_raise_clear_state()571710
+Ref: fl_popup_toggle_clear_state()571710
+Ref: fl_popup_entry_get_by_text()572881
+Ref: fl_popup_entry_get_by_text_f()572881
+Ref: fl_popup_entry_get_by_label()573836
+Ref: fl_popup_entry_get_by_label_f()573836
+Ref: fl_popup_entry_get_by_value()574513
+Ref: fl_popup_entry_get_by_user_data()574734
+Ref: fl_popup_entry_get_by_position()575083
+Node: Popup Attributes575446
+Ref: fl_popup_set_title()575593
+Ref: fl_popup_set_title_f()575593
+Ref: fl_popup_get_title()575593
+Ref: fl_popup_get_title_font()576208
+Ref: fl_popup_set_title_font()576208
+Ref: fl_popup_entry_set_font()576844
+Ref: fl_popup_get_min_width()577518
+Ref: fl_popup_set_min_width()577518
+Ref: fl_popup_get_bw()578050
+Ref: fl_popup_set_bw()578050
+Ref: fl_popup_set_cursor()578572
+Ref: fl_popup_set_color()579140
+Ref: fl_popup_get_color()579140
+Ref: FL_POPUP_BACKGROUND_COLOR579361
+Ref: FL_POPUP_HIGHLIGHT_COLOR579446
+Ref: FL_POPUP_TITLE_COLOR579603
+Ref: FL_POPUP_TEXT_COLOR579696
+Ref: FL_POPUP_HIGHLIGHT_TEXT_COLOR579781
+Ref: FL_POPUP_DISABLED_TEXT_COLOR579922
+Ref: FL_POPUP_RADIO_COLOR580041
+Ref: fl_popup_entry_set_text()580527
+Ref: fl_popup_entry_set_shortcut()580838
+Ref: fl_popup_entry_set_value()581087
+Ref: fl_popup_entry_set_user_data()581284
+Ref: fl_popup_entry_get_group()581519
+Ref: fl_popup_entry_set_group()581831
+Ref: fl_popup_entry_get_subpopup()582496
+Ref: fl_popup_entry_set_subpopup()582496
+Node: Part III Deprecated Objects583422
+Node: Choice Object583908
+Node: Adding Choice Objects584625
+Ref: fl_add_choice()584824
+Node: Choice Types585096
+Ref: FL_NORMAL_CHOICE585291
+Ref: FL_NORMAL_CHOICE2585352
+Ref: FL_DROPLIST_CHOICE585431
+Node: Choice Interaction585536
+Node: Other Choice Routines587067
+Ref: fl_addto_choice()587357
+Ref: fl_addto_choice_f()587357
+Ref: fl_delete_choice()588453
+Ref: fl_clear_choice()588611
+Ref: fl_replace_choice()588688
+Ref: fl_replace_choice_f()588688
+Ref: fl_get_choice()589035
+Ref: fl_get_choice_text()589239
+Ref: fl_get_choice_item_text()589419
+Ref: fl_get_choice_maxitems()589556
+Ref: fl_set_choice_item_mode()589676
+Ref: fl_get_choice_item_mode()589887
+Ref: fl_set_choice_entries()590054
+Ref: fl_set_choice()590626
+Ref: fl_set_choice_text()590626
+Ref: fl_set_choice_text_f()590626
+Node: Choice Attributes591328
+Ref: fl_set_choice_align()591856
+Ref: fl_set_choice_fontsize()591970
+Ref: fl_set_choice_fontstyle()592087
+Ref: fl_set_choice_align_bottom()592776
+Node: Choice Remarks593131
+Node: Menu Object593313
+Node: Adding Menu Objects594060
+Ref: fl_add_menu()594240
+Node: Menu Types594436
+Ref: FL_PUSH_MENU594619
+Ref: FL_PULLDOWN_MENU594701
+Ref: FL_TOUCH_MENU594787
+Node: Menu Interaction595957
+Node: Other Menu Routines597303
+Ref: fl_set_menu()597855
+Ref: fl_addto_menu()599689
+Ref: fl_delete_menu_item()599954
+Ref: fl_replace_menu_item()599954
+Ref: fl_set_menu_entries()601137
+Ref: fl_clear_menu()602316
+Ref: fl_get_menu()602405
+Ref: fl_get_menu_item_text()603341
+Ref: fl_get_menu_text()603548
+Ref: fl_get_menu_maxitems()603659
+Ref: fl_set_menu_item_mode()603958
+Ref: FL_PUP_NONE604330
+Ref: FL_PUP_BOX604398
+Ref: FL_PUP_RADIO604557
+Ref: FL_PUP_GREY604758
+Ref: FL_PUP_CHECK604900
+Ref: fl_get_menu_item_mode()605174
+Ref: fl_set_menu_item_callback()605385
+Ref: fl_set_menu_item_shortcut()605938
+Ref: fl_show_menu_symbol()606313
+Node: Menu Attributes606707
+Ref: fl_set_menu_popup()607528
+Ref: fl_get_menu_popup()607997
+Ref: fl_set_menu_notitle()608358
+Node: Menu Remarks608411
+Node: XPopup608728
+Node: Creating XPopups609341
+Ref: fl_newpup()609525
+Ref: fl_defpup()609525
+Ref: fl_addtopup()615704
+Ref: fl_dopup()616139
+Ref: fl_current_pup()618794
+Ref: fl_freepup()619060
+Ref: fl_setpup_entries()619171
+Node: XPopup Interaction622820
+Ref: fl_setpup_shortcut()623836
+Ref: FL_PUP_CB625002
+Ref: fl_setpup_itemcb()625002
+Ref: fl_setpup_menucb()625002
+Ref: fl_setpup_entercb()626303
+Ref: fl_setpup_leavecb()626303
+Ref: fl_setpup_submenu()627130
+Node: Other XPopup Routines627680
+Ref: fl_setpup_mode()628121
+Ref: fl_getpup_mode()628570
+Ref: fl_getpup_text()628848
+Ref: fl_setpup_position()629206
+Ref: fl_setpup_align_bottom()629843
+Ref: fl_setpup_selection()630310
+Ref: fl_getpup_items()630540
+Node: XPopup Attributes630581
+Ref: fl_setpup_title()630797
+Ref: fl_setpup_title_f()630797
+Ref: fl_setpup_default_fontsize()631258
+Ref: fl_setpup_default_fontstyle()631258
+Ref: fl_setpup_default_bw()631258
+Ref: fl_setpup_default_cursor()631556
+Ref: fl_setpup_cursor()631841
+Ref: fl_setpup_shadow()632226
+Ref: fl_setpup_bw()632463
+Ref: fl_setpup_softedge()632463
+Ref: fl_setpup_default_color()632916
+Ref: fl_setpup_default_checkcolor()633254
+Ref: fl_setpup_maxpups()633440
+Ref: fl_showpup()633604
+Ref: fl_hidepup()633604
+Node: XPopup Remarks633839
+Node: Part IV634207
+Node: Part IV Introduction634623
+Node: Part IV Global Structure637207
+Ref: Part IV Global Structure-Footnote-1642197
+Node: The Routine fl_add_NEW()642337
+Ref: fl_malloc()643718
+Ref: fl_calloc()643718
+Ref: fl_realloc()643718
+Ref: fl_free()643718
+Ref: fl_strdup()644300
+Node: Part IV Events645234
+Ref: FL_DRAW645729
+Ref: fl_get_real_object_window()648166
+Ref: FL_DRAWLABEL648486
+Ref: FL_ENTER648769
+Ref: FL_LEAVE649316
+Ref: FL_MOTION649432
+Ref: FL_PUSH649638
+Ref: FL_LEFT_MOUSE649870
+Ref: FL_MIDDLE_MOUSE649946
+Ref: FL_RIGHT_MOUSE650026
+Ref: FL_SCROLLUP_MOUSE650104
+Ref: FL_SCROLLDOWN_MOUSE650201
+Ref: FL_RELEASE650302
+Ref: FL_DBLCLICK650468
+Ref: FL_TRPLCLICK650863
+Ref: FL_FOCUS651137
+Ref: FL_UNFOCUS651319
+Ref: FL_KEYPRESS651381
+Ref: FL_SHORTCUT651859
+Ref: FL_STEP652003
+Ref: FL_UPDATE652488
+Ref: FL_ATTRIB653146
+Ref: FL_FREEMEM653814
+Ref: FL_OTHER653985
+Node: Shortcuts654479
+Ref: fl_set_object_shortcut()654877
+Ref: fl_set_object_shortcutkey()656895
+Ref: FL_KEY_NORMAL659342
+Ref: FL_KEY_TAB659513
+Ref: FL_KEY_SPECIAL659625
+Ref: FL_KEY_ALL659803
+Node: Part IV The Type FL_OBJECT660015
+Ref: fl_make_object()675588
+Ref: fl_add_child()677152
+Ref: Part IV The Type FL_OBJECT-Footnote-1678966
+Node: Part IV Drawing Objects679065
+Node: General Remarks679504
+Ref: FL_State680460
+Ref: fl_default_window()681398
+Ref: fl_get_form_vclass()682255
+Ref: fl_get_vclass()682255
+Ref: fl_get_display()683385
+Ref: FL_FormDisplay()683407
+Ref: fl_win_to_form()683961
+Node: Color Handling684106
+Ref: fl_get_pixel()684640
+Ref: fl_color()684889
+Ref: fl_bk_color()684984
+Ref: fl_set_foreground()685134
+Ref: fl_set_background()685134
+Ref: fl_free_colors()685489
+Ref: fl_free_pixels()685874
+Ref: fl_mapcolor()686111
+Ref: fl_mapcolorname()686111
+Ref: fl_getmcolor()686111
+Node: Mouse Handling687023
+Ref: fl_get_form_mouse()687436
+Ref: fl_get_win_mouse()687436
+Ref: fl_get_mouse()688029
+Ref: fl_set_mouse()688256
+Node: Clipping688424
+Ref: fl_set_clipping()688629
+Ref: fl_is_clipped()689362
+Ref: fl_get_clipping()689731
+Ref: fl_unset_clipping()690294
+Ref: fl_is_global_clipped()690450
+Ref: fl_get_global_clipping()690450
+Ref: fl_set_text_clipping()690749
+Ref: fl_is_text_clipped()690749
+Ref: fl_get_text_clipping()690749
+Ref: fl_unset_text_clipping()690749
+Ref: fl_set_gc_clipping()691137
+Ref: fl_unset_gc_clipping()691137
+Node: Getting the Size691669
+Ref: fl_get_char_height()692348
+Ref: fl_get_char_width()692348
+Ref: fl_get_string_width()692999
+Ref: fl_get_string_height()692999
+Ref: fl_get_string_dimension()694204
+Node: Font Handling694347
+Ref: fl_get_fontstruct()694675
+Node: Drawing Functions695089
+Ref: fl_winset()695554
+Ref: fl_winget()695554
+Ref: fl_rectf()696204
+Ref: fl_rect()696204
+Ref: fl_rectbound()696654
+Ref: fl_roundrectf()696842
+Ref: fl_roundrect()696842
+Ref: fl_polyf()697124
+Ref: fl_polyl()697124
+Ref: fl_polybound()697124
+Ref: fl_ovalf()697908
+Ref: fl_ovall()697908
+Ref: fl_ovalbound()697908
+Ref: fl_circ()698984
+Ref: fl_circf()698984
+Ref: fl_circbound()698984
+Ref: fl_arc()699395
+Ref: fl_arcf()699395
+Ref: fl_pieslice()700136
+Ref: fl_ovalarc(700703
+Ref: fl_line()701282
+Ref: fl_diagline()701507
+Ref: fl_lines()701670
+Ref: fl_point()701851
+Ref: fl_points()701851
+Ref: fl_linewidth()702590
+Ref: fl_linestyle()702590
+Ref: fl_dashedlinestyle()703484
+Ref: fl_drawmode()704843
+Ref: fl_get_linewidth()705594
+Ref: fl_get_linestyle(()705594
+Ref: fl_get_drawmode(()705594
+Ref: fl_draw_box()705881
+Ref: fl_draw_frame()706466
+Ref: fl_draw_text()706745
+Ref: fl_draw_text_beside()706745
+Ref: fl_draw_text_cursor()708166
+Ref: fl_get_align_xy()708896
+Ref: fl_draw_object_label()709542
+Ref: fl_draw_object_label_outside()709542
+Node: Part IV An Example710720
+Node: Part IV New Buttons715997
+Ref: fl_create_generic_button()717107
+Ref: fl_add_button_class()720018
+Ref: Part IV New Buttons-Footnote-1730849
+Node: Part IV Using a Pre-emptive Handler730935
+Ref: fl_set_object_prehandler()732332
+Ref: fl_set_object_posthandler()732332
+Ref: FL_PREEMPT733461
+Node: Part V734505
+Node: Part V Overview of Main Functions734874
+Node: Version Information735422
+Ref: FL_VERSION735715
+Ref: FL_REVISION735760
+Ref: FL_INCLUDE_VERSION735797
+Ref: fl_library_version()735941
+Node: Initialization736630
+Ref: fl_initialize()736817
+Ref: fl_set_visualID()741155
+Ref: fl_get_cmdline_args()741960
+Ref: fl_set_defaults()742814
+Ref: FL_IOPT742814
+Ref: fl_get_coordunit()746438
+Ref: fl_set_coordunit()746438
+Ref: fl_set_border_width()747353
+Ref: fl_get_border_width()747778
+Ref: fl_set_scrollbar_type()747962
+Ref: fl_flip_yorigin()749021
+Ref: fl_set_tabstop()750184
+Ref: fl_set_form_dblbuffer()751139
+Ref: fl_set_object_dblbuffer()751139
+Ref: fl_set_error_handler()751937
+Ref: fl_set_error_logfp()752540
+Ref: fl_show_errors()752966
+Ref: fl_set_font_name()753206
+Ref: fl_set_font_name_f()753206
+Ref: fl_adjust_form_size()756127
+Ref: fl_fit_object_label()757418
+Ref: fl_set_icm_color()758359
+Ref: fl_get_icm_color()758600
+Ref: fl_finish()759121
+Node: Creating Forms759289
+Ref: fl_bgn_form()759501
+Ref: fl_set_form_background_color()760635
+Ref: fl_get_form_background_color()760635
+Ref: fl_end_form()761106
+Ref: fl_bgn_group()761295
+Ref: fl_end_group()761543
+Ref: fl_addto_form()762724
+Ref: fl_addto_group()762724
+Ref: fl_delete_object()763047
+Ref: fl_add_object()763277
+Ref: fl_free_object()763434
+Ref: fl_free_form()763915
+Node: Object Attributes764107
+Ref: fl_get_object_objclass()764673
+Ref: fl_get_object_type()764673
+Ref: fl_set_object_color()764926
+Ref: fl_get_object_color()765053
+Ref: fl_set_object_boxtype()765164
+Ref: fl_get_object_boxtype()765467
+Ref: fl_set_object_bw()765678
+Ref: fl_get_object_bw()765678
+Ref: fl_set_object_position()765925
+Ref: fl_get_object_position()765925
+Ref: fl_move_object()766223
+Ref: fl_set_object_size()766433
+Ref: fl_get_object_size()766433
+Ref: fl_set_object_geometry()766749
+Ref: fl_get_object_geometry()766749
+Ref: fl_get_object_bbox()767536
+Ref: fl_get_object_component()768148
+Ref: fl_set_object_lcolor()769054
+Ref: fl_set_object_lsize()769054
+Ref: fl_set_object_lstyle()769054
+Ref: fl_set_object_lalign()769054
+Ref: fl_set_object_label()769054
+Ref: fl_set_object_label_f()769054
+Ref: fl_get_object_lcolor()769527
+Ref: fl_get_object_lsize()769527
+Ref: fl_get_object_lstyle()769527
+Ref: fl_get_object_lalign()769527
+Ref: fl_get_object_label()769527
+Ref: fl_set_object_helper()769839
+Ref: fl_set_object_helper_f()769839
+Ref: fl_set_tooltip_boxtype()770501
+Ref: fl_set_tooltip_color()770501
+Ref: fl_set_tooltip_font()770501
+Ref: fl_set_object_resize()771133
+Ref: fl_get_object_resize()771133
+Ref: fl_set_object_gravity()771133
+Ref: fl_get_object_gravity()771133
+Ref: fl_freeze_form()771843
+Ref: fl_unfreeze_form()771843
+Ref: fl_freeze_all_forms()772213
+Ref: fl_unfreeze_all_forms()772213
+Ref: fl_set_object_automatic()772652
+Ref: fl_object_is_automatic()772780
+Ref: fl_set_object_dblclick()772930
+Ref: fl_get_object_dblclick()773221
+Ref: fl_hide_object()773358
+Ref: fl_show_object()773358
+Ref: fl_object_is_visible()773661
+Ref: fl_trigger_object()773710
+Ref: fl_set_focus_object()773839
+Ref: fl_reset_focus_object()774400
+Ref: fl_get_focus_object()774526
+Ref: fl_set_object_callback()774591
+Ref: fl_call_object_callback()774903
+Ref: fl_set_form_callback()775047
+Ref: fl_last_event()775506
+Ref: fl_current_event()775764
+Ref: FL_TRIGGER775892
+Ref: FL_NOEVENT776121
+Ref: fl_get_label_char_at_mouse)776368
+Ref: fl_object_ps_dump()777057
+Ref: flps_init()778262
+Node: Doing Interaction779920
+Ref: fl_show_form()780147
+Ref: fl_show_form_f()780147
+Ref: fl_set_app_mainform()784678
+Ref: fl_get_app_mainform()784885
+Ref: fl_set_app_nomainform()785350
+Ref: fl_prepare_form_window()785788
+Ref: fl_prepare_form_window_f()785788
+Ref: fl_show_form_window()786451
+Ref: fl_raise_form()786787
+Ref: fl_lower_form()786883
+Ref: fl_set_form_position()787099
+Ref: fl_set_form_size()787099
+Ref: fl_set_form_geometry()787099
+Ref: fl_scale_form()787099
+Ref: fl_get_decoration_sizes()787907
+Ref: fl_form_is_iconified()788392
+Ref: fl_set_form_minsize()788727
+Ref: fl_set_form_maxsize()788727
+Ref: fl_set_form_icon()789218
+Ref: fl_set_form_title()789652
+Ref: fl_set_form_title_f()789652
+Ref: fl_hide_form()789967
+Ref: fl_form_is_visible()790152
+Ref: fl_do_forms()790457
+Ref: fl_check_forms()790833
+Ref: fl_do_only_forms()791147
+Ref: fl_check_only_forms()791147
+Ref: fl_activate_form()791513
+Ref: fl_deactivate_form()791513
+Ref: fl_deactivate_all_forms()791656
+Ref: fl_activate_all_forms()791656
+Ref: fl_form_is_activated()791782
+Ref: fl_set_form_atactivate()792014
+Ref: fl_set_form_atdeactivate()792014
+Ref: fl_activate_object()792729
+Ref: fl_deactivate_object()792729
+Ref: fl_object_is_active()792985
+Ref: fl_redraw_object()793033
+Ref: fl_redraw_form()793394
+Ref: fl_set_event_callback()793821
+Ref: fl_add_event_callback()794125
+Ref: fl_remove_event_callback()794125
+Ref: fl_activate_event_callbacks()794974
+Node: Signals795027
+Ref: fl_add_signal_callback()795852
+Ref: fl_remove_signal_callback()797099
+Ref: fl_app_signal_direct()798163
+Ref: fl_signal_caught()798658
+Node: Idle Callbacks and Timeouts800462
+Ref: fl_set_idle_callback()800917
+Ref: fl_set_idle_delta()801678
+Ref: fl_add_timeout()802391
+Ref: fl_remove_timeout()803194
+Node: Global Variables and Macros803442
+Ref: FL_EVENT803721
+Ref: fl_current_form804141
+Ref: fl_display804232
+Ref: fl_screen804704
+Ref: fl_root804801
+Ref: fl_vroot804865
+Ref: fl_scrw805076
+Ref: fl_scrh805076
+Ref: fl_vmode805159
+Ref: fl_state805594
+Ref: fl_dpi805894
+Ref: fl_get_dpi()805894
+Ref: fl_visual806136
+Ref: fl_get_visual()806136
+Ref: fl_colormap806318
+Ref: fl_get_colormap()806318
+Ref: fl_ul_magic_char806502
+Node: Part V Some Useful Functions806828
+Node: Misc. Functions807110
+Ref: fl_ringbell()807333
+Ref: fl_whoami()807684
+Ref: fl_now()807806
+Ref: fl_gettime()807963
+Ref: fl_mode_capable()808236
+Ref: fl_get_visual_depth808766
+Ref: fl_msleep()808811
+Node: Windowing Support808949
+Ref: fl_wincreate()809439
+Ref: fl_winshow()809439
+Ref: fl_winopen()810167
+Ref: fl_winreparent()810978
+Ref: fl_initial_winsize()811430
+Ref: fl_winsize()811430
+Ref: fl_initial_winstate()812063
+Ref: fl_winminsize()812487
+Ref: fl_winmaxsize()812487
+Ref: fl_winposition()813187
+Ref: fl_initial_wingeometry()813431
+Ref: fl_wingeometry()813431
+Ref: fl_winaspect()813858
+Ref: fl_wintitle()814059
+Ref: fl_wintitle_f()814059
+Ref: fl_winicontitle()814471
+Ref: fl_winicontitle_f()814471
+Ref: fl_winicon()814631
+Ref: fl_noborder()814835
+Ref: fl_transient()814835
+Ref: fl_winbackground()814985
+Ref: fl_winstepsize()815133
+Ref: fl_reset_winconstraints()815537
+Ref: fl_get_winsize()815669
+Ref: fl_get_winorigin()815669
+Ref: fl_get_wingeometry()815669
+Ref: fl_winresize()816131
+Ref: fl_winmove()816542
+Ref: fl_winreshape()816662
+Ref: fl_iconify()816839
+Ref: fl_winhide()817131
+Ref: fl_winclose()817300
+Ref: fl_winisvalid()817632
+Ref: fl_winfocus()817979
+Node: Cursors818076
+Ref: fl_set_cursor()818286
+Ref: fl_reset_cursor()819358
+Ref: fl_set_cursor_color()819456
+Ref: fl_create_bitmap_cursor()819805
+Ref: fl_create_animated_cursor()820493
+Node: Clipboard821353
+Ref: fl_stuff_clipboard()822776
+Ref: fl_request_clipboard()823884
+Node: Part V Resources for Forms Library825375
+Node: Current Support826233
+Ref: fl_get_app_resources()827545
+Ref: FL_RTYPE828204
+Ref: FL_SHORT828205
+Ref: FL_BOOL828239
+Ref: FL_INT828281
+Ref: FL_LONG828312
+Ref: FL_FLOAT828345
+Ref: FL_STRING828380
+Ref: FL_NONE828417
+Node: Resources Example832172
+Ref: fl_get_resource()833699
+Ref: fl_set_resource()834564
+Node: Going Further834959
+Node: Part V Dirty Tricks836442
+Node: Interaction837100
+Node: Form Events837260
+Ref: fl_register_raw_callback()837758
+Node: Object Events840407
+Node: Other842515
+Node: Part V Trouble Shooting843069
+Node: Part VI844866
+Node: Part VI Images845058
+Node: The Basic Image Support API846733
+Ref: flimage_load()848257
+Ref: flimage_dump()848257
+Ref: flimage_free()849912
+Ref: flimage_display()850182
+Ref: flimage_sdisplay()850182
+Ref: flimage_is_supported()854495
+Node: The FL_IMAGE Structure854705
+Node: Supported image types863011
+Ref: flimage_windowlevel()865491
+Ref: flimage_type_name()865903
+Ref: flimage_convert()866031
+Node: Creating Images867763
+Ref: flimage_alloc()868388
+Ref: fl_get_matrix()869599
+Ref: flimage_getmem()869599
+Node: Supported Image Formats872056
+Node: Built-in support872697
+Ref: flimage_enable_bmp()874443
+Ref: flimage_enable_pnm()874443
+Ref: flimage_enable_genesis()874443
+Ref: flimage_enable_fits()874443
+Ref: flimage_enable_gif()874443
+Ref: flimage_enable_gzip()874443
+Ref: flimage_enable_jpeg()874443
+Ref: flimage_enable_png()874443
+Ref: flimage_enable_ps()874443
+Ref: flimage_enable_sgi()874443
+Ref: flimage_enable_tiff()874443
+Ref: flimage_enable_xbm()874443
+Ref: flimage_enable_xpm()874443
+Ref: flimage_enable_xwd()874443
+Ref: flimage_jpeg_output_options()875313
+Ref: flimage_pnm_output_options()875667
+Ref: flimage_gif_output_options()875935
+Ref: flimage_ps_options()876221
+Ref: Built-in support-Footnote-1878258
+Node: Adding New Formats878420
+Ref: flimage_add_format()878924
+Ref: flimage_description_via_filter()885715
+Ref: flimage_write_via_filter()885715
+Node: Queries889911
+Ref: flimage_get_number_of_formats()890251
+Ref: flimage_get_format_info()890459
+Node: Setup and Configuration891685
+Ref: flimage_setup()892576
+Ref: flimage_error()895623
+Ref: flimage_open()897447
+Ref: flimage_read()897650
+Ref: flimage_close()897908
+Ref: Setup and Configuration-Footnote-1898047
+Node: Simple Image Processing898185
+Node: Convolution899113
+Ref: flimage_convolve()899307
+Ref: flimage_convolvea()899824
+Node: Tint900646
+Ref: flimage_tint()900947
+Ref: Tint-Footnote-1901996
+Node: Rotation902087
+Ref: flimage_rotate()902284
+Node: Image Flipping903933
+Ref: flimage_flip()904456
+Node: Cropping904592
+Ref: flimage_autocrop()904782
+Ref: flimage_crop()904782
+Ref: flimage_get_autocrop()906348
+Node: Scaling906796
+Ref: flimage_scale()907406
+Node: Warping909109
+Ref: flimage_warp()911822
+Node: General Pixel Transformation913945
+Ref: flimage_transform_pixels()914359
+Node: Image Annotation915392
+Node: Using Text Strings915856
+Ref: flimage_add_text()916061
+Ref: flimage_add_text_struct()917603
+Ref: flimage_delete_all_text()918586
+Node: Using Markers918769
+Ref: flimage_add_marker()919095
+Ref: flimage_add_marker_struct()919095
+Ref: flimage_delete_all_markers()921086
+Ref: flimage_define_marker()921315
+Node: Pixelizing the Annotation922344
+Ref: flimage_render_annotation()923135
+Node: Write Your Own Routines924368
+Node: Utilities924956
+Node: Memory Allocation925272
+Ref: fl_make_matrix()925539
+Ref: fl_free_matrix()926716
+Ref: flimage_dup()927251
+Ref: flimage_to_pixmap()927520
+Ref: flimage_from_pixmap()927520
+Node: Color Quantization927859
+Ref: flimage_select_octree_quantizer()929210
+Ref: flimage_select_mediancut_quantizer()929307
+Node: Remarks929607
+Node: Index of Functions930595
+Node: Index of Global Variables1042189
+Node: Index of Constants1044385
+
+End Tag Table
+
+
+Local Variables:
+coding: utf-8
+End:

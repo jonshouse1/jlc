@@ -1,0 +1,84 @@
+#!/bin/bash
+
+# We want to re-create the entire www directory each time run
+if [ -d ../www ]; then
+	echo "../www exsists, remove it first"
+	exit 1
+fi
+mkdir ../www
+
+MODEL=$1
+if [ "$MODEL" == "" ]; then
+	echo "usage ./make_www <MODEL>"
+	echo
+	echo "	Valid models are:"
+	echo
+	echo -e "\th801"
+        echo -e "\tdmx_5ch_ws2811"
+        echo -e "\tsonoff_relay1"
+        echo -e "\tsonoff_relay4"
+        echo -e "\tsonoff_relay_th10"
+        echo
+        echo "DEV_N Devices (Sensors/Switches/Gadgets)"
+        echo -e "\tT1_UK_1C"
+        echo -e "\tT1_UK_2C"
+        echo -e "\tT1_UK_3C"
+	exit 1
+fi
+
+echo "make_www for $MODEL channel model"
+
+# Starting page for system, was index.cgi before
+FNAME="index.cgi"
+./fragment_pagestart "Control" >../www/$FNAME
+cat fragment_stylesheet >>../www/$FNAME
+cat fragment_menu >>../www/$FNAME
+echo "<script type="text/javascript">" >>../www/$FNAME
+cat slider5.js >>../www/$FNAME
+echo "</script>" >>../www/$FNAME
+cat fragment_controlform_start >>../www/$FNAME
+#cat fragment_controlform_buttons >>../www/$FNAME
+#cat fragment_controlform_footer >>../www/$FNAME
+echo "<P> "$MODEL"C</p>" >>../www/$FNAME
+
+
+
+FNAME="reflash.html"
+./fragment_pagestart "Reflash" >../www/$FNAME
+cat fragment_stylesheet >>../www/$FNAME
+cat fragment_menu >>../www/$FNAME
+echo "<p> Re-Starting ....</p>" >>../www/$FNAME
+cat fragment_footer >>../www/$FNAME
+
+
+FNAME="settings.cgi"
+./fragment_pagestart "Settings" >../www/$FNAME
+cat fragment_stylesheet >>../www/$FNAME
+cat fragment_menu >>../www/$FNAME
+cat fragment_wifi >>../www/$FNAME
+#ADNAME="fragment_advanced_"$MODEL""
+#cat $ADNAME >>../www/$FNAME
+#echo Using $ADNAME
+cat fragment_wifi_tableend >>../www/$FNAME
+cat fragment_footer >>../www/$FNAME
+
+
+
+FNAME="help.cgi"
+./fragment_pagestart "Help" >../www/$FNAME
+cat fragment_stylesheet >>../www/$FNAME
+cat fragment_menu >>../www/$FNAME
+cat fragment_help >>../www/$FNAME
+cat fragment_footer >>../www/$FNAME
+
+
+
+# Genral assets
+cp assets/backwash.jpg ../www/
+cp assets/logo.jpg ../www/
+cp assets/pixel.gif ../www/
+
+
+# Web pages are in memory file system (MFS) so make sure that gets re-flashed 
+#cd ..
+echo "makewww/makewww: compete,  You should have a www directory with files in it"

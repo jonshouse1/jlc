@@ -1,0 +1,11 @@
+#!/bin/bash
+
+echo "Building for xforms"
+make clean
+make -f Makefile
+echo
+
+
+echo "Building for GTK"
+make clean
+make -f Makefile_gtk

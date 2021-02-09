@@ -1,0 +1,6 @@
+# Driveway
+if daylight stop
+group 3 on
+# fade all to black after N seconds
+gfd 3 120
+

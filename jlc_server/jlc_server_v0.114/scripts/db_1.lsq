@@ -1,0 +1,9 @@
+# Doorbell, flash kitchen lights
+
+# Strobe channel, 250ms on/off for 2000ms before setting to a value of 200
+ST 16 1 250 2
+ST 16 2 250 2
+ST 16 3 250 2
+ST 16 4 250 2
+ST 16 5 250 2
+

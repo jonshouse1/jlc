@@ -1,0 +1,72 @@
+#!/bin/bash
+# compile the player sources using the machine the target will run on, the more usual way
+# Version 1.4
+#
+# Last Modified 13 Sep 2013
+#
+# GCC OPtions crib sheet
+# -g 			include debug symbols
+# --static		use static linking
+# -O			set optimization level (2 is ideal)
+# -Wall			show all warnings
+
+
+#*********************************************
+VERS="stream_audioplus_V0.6"
+
+
+#*********************************************
+# Work out what kind of machine we are compiling on
+ARCH=`arch`
+if [ "$ARCH" == "armv6l" ]; then
+	ARCH="armv6"
+fi
+if [ "$ARCH" == "armv6" ]; then
+	# use this for Pi
+	MACHINE="-DRPI"
+	OPTIONS="-O2 -march=$ARCH -mfpu=vfp -mfloat-abi=hard -DTUNER_RPI_TEA5767"
+	#OPTIONS=""
+else
+	# bit of wild guess, might be sparc or mips or summink
+	MACHINE="-DINTEL"
+ 	#OPTIONS="-O2 -march=native"
+	OPTIONS=""	# for speed, put back later
+fi
+
+
+#*********************************************
+COMPILER="gcc"
+
+
+#*********************************************
+cd "$VERS"
+OP=`echo $OPTIONS |grep 'O2' `
+echo "Building sources: $VERS    Machine: $MACHINE    Opts: $OPTIONS"
+if [ "$OP" == "" ]; then
+	echo "WARNING no -O2 in compiler options, compiles fast but runs slower"
+fi
+
+
+#*********************************************
+# -l rt = high res timer read
+echo -e "Compiling streamaudioplus.c \t\t\t -> streamaudioplus_alsa"
+$COMPILER -g streamaudioplus.c $MACHINE $OPTIONS -DALSA -lm -lasound -lpthread -o streamaudioplus_alsa
+if [ ! -f streamaudioplus_alsa ]; then
+	echo "FAILED !"
+#else
+	#mv streamaudioplus_alsa ../
+fi
+
+
+
+#*********************************************
+echo -e "Compiling streamaudioplus.c \t\t\t -> streamaudioplus_pulse"
+$COMPILER -g streamaudioplus.c $MACHINE -DPULSE -lm -lpulse -lpulse-simple $OPTIONS -o streamaudioplus_pulse
+if [ ! -f streamaudioplus_pulse ]; then
+	echo "FAILED !"
+#else
+	#mv streamaudioplus_pulse ../
+fi
+
+
+

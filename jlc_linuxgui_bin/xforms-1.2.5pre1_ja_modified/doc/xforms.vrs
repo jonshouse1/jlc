@@ -1,0 +1,14 @@
+\entry{\code {fl_colormap}}{298}
+\entry{\code {fl_current_form}}{297}
+\entry{\code {fl_display}}{298}
+\entry{\code {fl_dpi}}{298}
+\entry{\code {fl_root}}{298}
+\entry{\code {fl_screen}}{298}
+\entry{\code {fl_scrh}}{298}
+\entry{\code {fl_scrw}}{298}
+\entry{\code {fl_state}}{298}
+\entry{\code {fl_ul_magic_char}}{299}
+\entry{\code {fl_visual}}{298}
+\entry{\code {fl_vmode}}{298}
+\entry{\code {fl_vroot}}{298}
+\entry{\code {FL_EVENT}}{297}

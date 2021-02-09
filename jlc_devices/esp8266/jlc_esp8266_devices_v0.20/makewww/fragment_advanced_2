@@ -1,0 +1,28 @@
+<!--- fragment_advanced_2 -->
+<tr>
+<tr>
+<table width=100%><td><h3>Advanced Settings</h3><td align=right>
+<td><tr>&nbsp;</tr></td>
+</table>
+
+
+<table cellspacing=" 1" width=" 100%" cellpadding=" 0" bgcolor="#ffffff" border=" 1">
+
+<td align="left" bgcolor="#004785" color=#FFFFFF width=40%>
+<font face="Arial" color="#ffffff" size=" 5">
+Location
+</td><td>&nbsp;
+<input maxlength="32 " size="32" name="LOC" style="font-size:25px" value="$LOC                           " ></font></td><tr>
+
+<td align="left" bgcolor="#004785" color=#FFFFFF width=40%>
+<font face="Arial" color="#ffffff" size=" 5">
+Switch number for channel 1
+</td><td>&nbsp;
+<input maxlength="16 " size="16" name="SWI1" style="font-size:25px" value="$SWI1         " ></font></td><tr>
+
+
+<td align="left" bgcolor="#004785" color=#FFFFFF width=40%>
+<font face="Arial" color="#ffffff" size=" 5">
+Switch number for channel 2
+</td><td>&nbsp;
+<input maxlength="16 " size="16" name="SWI2" style="font-size:25px" value="$SWI2         " ></font></td><tr>
